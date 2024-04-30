@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/club
+    username: postgres
+    password: 8hicpjnpMjUTP5e@
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+  application:
+    name: club-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      format_sql: true
+  
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG # Registra las consultas SQL ejecutadas por Hibernate en el nivel de depuraci�n (DEBUG).
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE # Registra los enlaces de par�metros en las consultas SQL en el nivel de traza (TRACE).
+
+server:
+  servlet:
+    context-path: /club-service # Nombre del microservicio
+  port: 8081
