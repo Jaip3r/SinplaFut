@@ -18,30 +18,27 @@ public class ClubServiceImpl implements ClubService {
     private final IClubDAO iClubDAO;
     
     @Override
-    public List<ClubResponseDTO> findAll() {
-        
-        return this.iClubDAO.findAll().stream()
-                .map(this::clubToResponseDTO).toList();
-
+    public List<Club> findAll() {
+        return this.iClubDAO.findAll();
     }
 
     @Override
-    public ClubResponseDTO findById(Long id) {
+    public Club findById(Long id) {
         
         var club = this.iClubDAO.findById(id)
             .orElseThrow();
 
-        return this.clubToResponseDTO(club);
+        return club;
 
     }
 
     @Override
-    public ClubResponseDTO findByStadium(String estadio) {
+    public Club findByStadium(String estadio) {
 
         var club = this.iClubDAO.findByStadium(estadio)
             .orElseThrow();
 
-        return this.clubToResponseDTO(club);
+        return club;
 
     }
 
@@ -53,21 +50,6 @@ public class ClubServiceImpl implements ClubService {
     @Override
     public void deleteById(Long id) {
         this.iClubDAO.deleteById(id);
-    }
-
-    private ClubResponseDTO clubToResponseDTO(Club club) {
-
-        return ClubResponseDTO.builder()
-                .id(club.getId())
-                .nombre(club.getNombre())
-                .direccion(club.getDireccion())
-                .telefono(club.getTelefono())
-                .ciudad(club.getCiudad())
-                .pais(club.getPais())
-                .estadio(club.getEstadio())
-                .logoUrl(club.getLogoUrl())
-                .build();
-
     }
     
 }
