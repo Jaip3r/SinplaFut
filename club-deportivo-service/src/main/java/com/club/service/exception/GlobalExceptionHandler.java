@@ -16,7 +16,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.club.service.controllers.Payload.ApiResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     // Data fields errors
@@ -68,6 +71,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleTypeMismatchException(MethodArgumentTypeMismatchException exception){
 
+        log.warn("Error de tipo de argumento {}", exception);
         return ApiResponse
             .builder()
             .flag(false)
@@ -83,6 +87,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
 
+        log.warn("Error de deserialización {}", exception);
         return ApiResponse
             .builder()
             .flag(false)
@@ -98,6 +103,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleIoException(IOException exception){
 
+        log.warn("Error de manipulación de archivos {}", exception);
         return ApiResponse
             .builder()
             .flag(false)
@@ -143,6 +149,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     ApiResponse handleNoResourceFoundException(NoResourceFoundException exception){
         
+        log.warn("Intento de acceso a recurso no identificado");
         return ApiResponse
             .builder()
             .flag(false)
@@ -172,6 +179,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ApiResponse handleDataAccessException(DataAccessException exception){
 
+        log.error("Error de servidor de BD {}", exception);
         return ApiResponse
             .builder()
             .flag(false)
@@ -186,12 +194,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ApiResponse handleOtherException(Exception exception){
 
+        log.error("Error interno de servidor {}", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(500)
-            .message("Error interno de servidor " + exception.getMessage())
-            .data(exception)
+            .message("Ha ocurrido un error inesperado")
+            .data(exception.getMessage())
             .build();
 
     }

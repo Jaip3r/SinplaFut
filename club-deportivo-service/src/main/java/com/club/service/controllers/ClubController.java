@@ -16,6 +16,7 @@ import com.club.service.services.ClubService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("club")
 @RequiredArgsConstructor
+@Slf4j
 public class ClubController {
 
     // Services
@@ -65,6 +67,7 @@ public class ClubController {
 
         // Verificaciones de identidad
         if (club == null){
+            log.warn("Club con identificador {} no identificado", id);
             throw new ResourceNotFoundException("Club", "identificador", id);
         }
 
@@ -93,11 +96,12 @@ public class ClubController {
 
         // Verificaciones antes de crear el registro
         if (this.clubService.findByStadium(estadio) != null){
+            log.warn("Estadio {} actualmente en uso", estadio);
             throw new ResourceAlreadyExistsException("Estadio", "Nombre", estadio);
         }
 
         // Cargamos el archivo
-        Map<String, String> map = this.cloudinaryService.uploadFile(file, nombre);
+        Map<String, String> map = this.cloudinaryService.uploadFile(file, nombre.trim());
 
         // Creamos el club con la información proporcionada
         Club club = Club
@@ -114,6 +118,7 @@ public class ClubController {
             
         this.clubService.save(club);
 
+        log.info("POST: club {}", club.getNombre());
         return ResponseEntity.ok(ApiResponse
             .builder()
             .flag(true)
@@ -134,16 +139,22 @@ public class ClubController {
         @RequestParam("ciudad") String ciudad,
         @RequestParam("pais") String pais,
         @RequestParam("estadio") String estadio, 
-        @RequestParam("file") @Valid @ValidFile(message = "Solo se admiten archivos de imagen .png") MultipartFile file,
+        @RequestParam(required = false, name = "file") @Valid @ValidFile(message = "Solo se admiten archivos de imagen .png") MultipartFile file,
         @Valid ClubDTO clubDTO
     ) throws IOException{
 
         // Obtenemos el club
         Club club = this.clubService.findById(id);
+
+        if (club == null){
+            log.warn("Club con identificador {} no identificado", id);
+            throw new ResourceNotFoundException("Club", "identificador", id);
+        }
+
         String nombreOriginal = club.getNombre();
 
-        // Verificaciones antes de crear el registro
-        if (this.clubService.findByStadium(estadio) != null && !estadio.toLowerCase().equals(club.getEstadio())){
+        if (this.clubService.findByStadium(estadio) != null && !estadio.toLowerCase().equals(club.getEstadio().toLowerCase())){
+            log.warn("Estadio {} actualmente en uso", estadio);
             throw new ResourceAlreadyExistsException("Estadio", "Nombre", estadio);
         }
 
@@ -156,8 +167,8 @@ public class ClubController {
         club.setEstadio(estadio);
 
         // Actualizamos el logo si se provee un archivo
-        if (file == null){
-            Map<String, String> result = this.cloudinaryService.updateFile(file, nombreOriginal);
+        if (file != null){
+            Map<String, String> result = this.cloudinaryService.updateFile(file, nombreOriginal.trim());
             club.setLogoUrl(result.get("secure_url"));
             club.setLogoId(result.get("public_id"));
         }
@@ -165,6 +176,7 @@ public class ClubController {
         // Guardamos los cambios    
         this.clubService.save(club);
 
+        log.info("PUT: club {}", club);
         return ResponseEntity.ok(ApiResponse
             .builder()
             .flag(true)
@@ -183,6 +195,7 @@ public class ClubController {
         Club club = this.clubService.findById(id);
 
         if (club == null){
+            log.warn("Club con identificador {} no identificado", id);
             throw new ResourceNotFoundException("Club", "identificador", id);
         }
 
@@ -192,6 +205,7 @@ public class ClubController {
         // Eliminamos el club
         this.clubService.deleteById(id);
 
+        log.info("DELETE: club {}", club);
         return ResponseEntity.ok(ApiResponse
             .builder()
             .flag(true)

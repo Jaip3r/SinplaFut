@@ -34,6 +34,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
      * @return Map<String, String> con las propiedades del archivo subido
      * @throws IOException
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Map<String, String> uploadFile(MultipartFile multipartFile, String filename) throws IOException {
         
@@ -64,6 +65,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
      * @throws IOException
      */
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Map<String, String> updateFile(MultipartFile multipartFile, String public_id) throws IOException {
         
         // Convertimos el nuevo archivo para compatibilidad con cloudinary
@@ -92,6 +94,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
      * @throws IOException
      */
     @Override
+    @SuppressWarnings({ "unchecked" })
     public Map<String, String> delete(String id) throws IOException {
         return this.cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
     }
