@@ -190,7 +190,7 @@ public class GlobalExceptionHandler {
             .builder()
             .flag(false)
             .code(500)
-            .message("Error interno de servidor")
+            .message("Error interno de servidor " + exception.getMessage())
             .data(exception)
             .build();
 

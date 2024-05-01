@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
@@ -16,6 +17,7 @@ import com.club.service.services.CloudinaryService;
 
 import jakarta.annotation.PostConstruct;
 
+@Service
 public class CloudinaryServiceImpl implements CloudinaryService{
 
     // Instancia de cloudinary
@@ -40,7 +42,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 
         // Definimos la configuración de subida
         Map opciones = ObjectUtils.asMap(
-            "folder", "poke_api",
+            "folder", "clubs",
             "public_id", filename
         );
 
@@ -69,7 +71,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 
         // Definimos la configuración de subida
         Map opciones = ObjectUtils.asMap(
-            "folder", "poke_api",
+            "folder", "clubs",
             "public_id", public_id
         );
 

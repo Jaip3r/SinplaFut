@@ -9,7 +9,7 @@ public record ClubDTO (
 
     @NotBlank(message = "El nombre del club es obligatorio")
     @Length(min = 3, max = 20, message = "El nombre del club debe contener entre 3 y 20 caracteres")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ]+$", message = "El nombre del club no debe contener caracteres especiales")
+    @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El nombre del club no debe contener caracteres especiales")
     String nombre,
 
     @NotBlank(message = "La dirección del club es obligatoria")
@@ -31,7 +31,7 @@ public record ClubDTO (
 
     @NotBlank(message = "El estadio del club es obligatorio")
     @Length(min = 3, max = 25, message = "El nombre del estadio debe contener entre 3 y 25 caracteres")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ]+$", message = "El nombre del estadio no debe contener caracteres especiales")
+    @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El nombre del estadio no debe contener caracteres especiales")
     String estadio
 
 ) {

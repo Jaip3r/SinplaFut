@@ -30,6 +30,6 @@ server:
     context-path: /club-service # Nombre del microservicio
   port: 8081
 
-applicaiton:
+application:
   services:
       cloudinary_service: cloudinary://892731456566195:mPxBdk2BN45k6r-TDXyKyPOCOak@dojljgscf
