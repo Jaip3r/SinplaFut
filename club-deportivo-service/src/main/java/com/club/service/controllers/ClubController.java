@@ -8,6 +8,7 @@ import com.club.service.controllers.DTO.ClubDTO;
 import com.club.service.controllers.DTO.ClubResponseDTO;
 import com.club.service.controllers.Payload.ApiResponse;
 import com.club.service.exception.ResourceAlreadyExistsException;
+import com.club.service.exception.ResourceNotFoundException;
 import com.club.service.exception.annotation.ValidFile;
 import com.club.service.models.Club;
 import com.club.service.services.CloudinaryService;
@@ -21,10 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -40,6 +42,7 @@ public class ClubController {
     @GetMapping("/findAll")
     public ResponseEntity<ApiResponse> getClubs() {
         
+        // Obtenemos la lista de todos los clubes registrados
         List<ClubResponseDTO> clubList = this.clubService.findAll()
                 .stream().map(this::clubToResponseDTO).toList();
 
@@ -57,7 +60,13 @@ public class ClubController {
     @GetMapping("/find/{id}")
     public ResponseEntity<ApiResponse> getClubById(@PathVariable Long id) {
         
+        // Obtenemos el club
         Club club = this.clubService.findById(id);
+
+        // Verificaciones de identidad
+        if (club == null){
+            throw new ResourceNotFoundException("Club", "identificador", id);
+        }
 
         return ResponseEntity.ok(ApiResponse
             .builder()
@@ -116,7 +125,7 @@ public class ClubController {
            
     }
 
-    /*@PutMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse> updateClub(
         @PathVariable Long id,
         @RequestParam("nombre") String nombre,
@@ -125,47 +134,74 @@ public class ClubController {
         @RequestParam("ciudad") String ciudad,
         @RequestParam("pais") String pais,
         @RequestParam("estadio") String estadio, 
-        @RequestParam("file") MultipartFile file,
+        @RequestParam("file") @Valid @ValidFile(message = "Solo se admiten archivos de imagen .png") MultipartFile file,
         @Valid ClubDTO clubDTO
-    ){
+    ) throws IOException{
 
-        try {
+        // Obtenemos el club
+        Club club = this.clubService.findById(id);
+        String nombreOriginal = club.getNombre();
 
-            // Consultar el club a actualizar
-            Club club = this.clubService.findById(id);
-
-            if (this.clubService.findByStadium(estadio)){}
-
-            // Cargamos el archivo
-            Map<String, String> map = this.cloudinaryService.uploadFile(file, nombre);
-
-            
-            
-            this.clubService.save(club);
-        
-        }catch (Exception e) {
-           
-            return ResponseEntity.ok(ApiResponse
-                .builder()
-                .flag(true)
-                .code(200)
-                .message("Pokémon registrado correctamente")
-                .data("No data provided")
-                .build()
-            );
-
+        // Verificaciones antes de crear el registro
+        if (this.clubService.findByStadium(estadio) != null && !estadio.toLowerCase().equals(club.getEstadio())){
+            throw new ResourceAlreadyExistsException("Estadio", "Nombre", estadio);
         }
 
-        return ResponseEntity.ok(ApiResponse
-                .builder()
-                .flag(true)
-                .code(200)
-                .message("Pokémon registrado correctamente")
-                .data("No data provided")
-                .build()
-            );
+        // Actualizamos la data del club
+        club.setNombre(nombre);
+        club.setDireccion(direccion);
+        club.setTelefono(telefono);
+        club.setCiudad(ciudad);
+        club.setPais(pais);
+        club.setEstadio(estadio);
+
+        // Actualizamos el logo si se provee un archivo
+        if (file == null){
+            Map<String, String> result = this.cloudinaryService.updateFile(file, nombreOriginal);
+            club.setLogoUrl(result.get("secure_url"));
+            club.setLogoId(result.get("public_id"));
+        }
         
-    }*/
+        // Guardamos los cambios    
+        this.clubService.save(club);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Club actualizado correctamente")
+            .data("No data provided")
+            .build()
+        );
+        
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> deleteClub(@PathVariable Long id) throws IOException{
+
+        // Obtenemos el club
+        Club club = this.clubService.findById(id);
+
+        if (club == null){
+            throw new ResourceNotFoundException("Club", "identificador", id);
+        }
+
+        // Eliminamos el logo asociado
+        this.cloudinaryService.delete(club.getLogoId());
+
+        // Eliminamos el club
+        this.clubService.deleteById(id);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Club eliminado correctamente")
+            .data("No data provided")
+            .build()
+        );
+
+    }
 
 
     // Converter methods

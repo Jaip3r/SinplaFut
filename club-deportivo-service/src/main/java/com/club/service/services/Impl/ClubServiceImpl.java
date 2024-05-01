@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.club.service.exception.ResourceNotFoundException;
 import com.club.service.models.Club;
 import com.club.service.persistence.IClubDAO;
 import com.club.service.services.ClubService;
@@ -26,7 +25,7 @@ public class ClubServiceImpl implements ClubService {
     public Club findById(Long id) {
         
         var club = this.iClubDAO.findById(id)
-            .orElseThrow(null);
+            .orElse(null);
 
         return club;
 
