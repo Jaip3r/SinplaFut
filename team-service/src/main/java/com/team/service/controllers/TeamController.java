@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.team.service.controllers.dtos.TeamDTO;
 import com.team.service.controllers.dtos.TeamResponseDTO;
 import com.team.service.controllers.payload.ApiResponse;
+import com.team.service.exception.ResourceNotFoundException;
 import com.team.service.exception.annotation.ValidFile;
 import com.team.service.models.Category;
 import com.team.service.models.Team;
@@ -64,7 +65,7 @@ public class TeamController {
 
         // Verificaciones de identidad
         if (equipo == null){
-
+            throw new ResourceNotFoundException("Equipo", "identificador", id);
         }
 
         return ResponseEntity.ok(
@@ -129,7 +130,7 @@ public class TeamController {
         Team equipo = this.teamService.findById(id);
 
         if (equipo == null){
-
+            throw new ResourceNotFoundException("Equipo", "identificador", id);
         }
 
         String nombreOriginal = equipo.getNombre();
@@ -168,7 +169,7 @@ public class TeamController {
         Team equipo = this.teamService.findById(id);
 
         if (equipo == null){
-
+            throw new ResourceNotFoundException("Equipo", "identificador", id);
         }
 
         // Eliminamos el escudo asociado
