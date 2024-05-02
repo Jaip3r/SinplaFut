@@ -1,5 +1,8 @@
 package com.team.service.controllers.dtos;
 
+import lombok.Builder;
+
+@Builder
 public record TeamResponseDTO (
 
     Long id,
