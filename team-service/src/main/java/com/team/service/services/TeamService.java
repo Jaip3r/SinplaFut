@@ -12,6 +12,8 @@ public interface TeamService {
 
     Team findById(Long id);
 
+    Team findByName(String name);
+
     void save(Team team);
 
     void delete(Long id);

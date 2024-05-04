@@ -11,6 +11,8 @@ public interface ITeamDAO {
 
     List<Team> findByClub(Long club_id);
 
+    Optional<Team> findByName(String name);
+
     Optional<Team> findById(Long id);
 
     void save(Team team);

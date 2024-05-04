@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // Data fields errors
+    // Data fields JSON/formData
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleInvalidArguments(MethodArgumentNotValidException exception){
@@ -38,13 +38,12 @@ public class GlobalExceptionHandler {
             .builder()
             .flag(false)
             .code(400)
-            .message("Input Error")
-            .data(builder.toString())
+            .message(builder.toString())
+            .data("Error de validación de campos: " + exception.getCause())
             .build();
 
     }
 
-    // Incorrect data type method arguments
     @ExceptionHandler(HandlerMethodValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleMethodValidationError(HandlerMethodValidationException exception){
@@ -61,58 +60,78 @@ public class GlobalExceptionHandler {
             .flag(false)
             .code(400)
             .message(builder.toString())
-            .data(exception.getCause())
+            .data("Error de validación de campos: " + exception.getCause())
             .build();
 
     }
+
 
     // Incorrect data type method arguments
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleTypeMismatchException(MethodArgumentTypeMismatchException exception){
 
-        log.warn("Error de tipo de argumento {}", exception);
+        log.warn("Error de tipo de argumento", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(400)
             .message("Favor proveer el tipo de argumento correcto")
-            .data(exception.getMessage())
+            .data("Error de tipo de argumento en metodo " + exception.getMessage())
             .build();
 
     }
+
 
     // Deserialization error
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
 
-        log.warn("Error de deserialización {}", exception);
+        log.warn("Error de deserialización", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(400)
-            .message("Error en la deserialización del JSON")
-            .data(exception.getMessage())
+            .message("Error al interpretar los datos")
+            .data("Error de deserialización JSON: " + exception.getMessage())
             .build();
         
     }
+
 
     // File exception
     @ExceptionHandler(IOException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handleIoException(IOException exception){
 
-        log.warn("Error de manipulación de archivos {}", exception);
+        log.warn("Error de manipulación de archivos", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(400)
-            .message("Error al subir el archivo")
-            .data(exception.getMessage())
+            .message("Error al cargar archivos")
+            .data("Error al trabajar con archivos: " + exception.getMessage())
             .build();
 
     }
+
+
+    // Team already exists
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse handlerResourceAlreadyExistsException(ResourceAlreadyExistsException exception){
+        
+        return ApiResponse
+            .builder()
+            .flag(false)
+            .code(400)
+            .message(exception.getMessage())
+            .data("Equipo de futbol ya existente")
+            .build();
+
+    }
+
 
     // Team resource not found
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -123,11 +142,12 @@ public class GlobalExceptionHandler {
             .builder()
             .flag(false)
             .code(400)
-            .message("Equipo no identificado")
-            .data(exception.getMessage())
+            .message(exception.getMessage())
+            .data("Equipo no identificado")
             .build();
 
     }
+
 
     // 404 errors
     @ExceptionHandler(NoResourceFoundException.class)
@@ -149,6 +169,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse handlerNoHandlerFoundException(NoHandlerFoundException exception) {
         
+        log.warn("Acción delicada no manejadad correctamente", exception);
         return ApiResponse
             .builder()
             .flag(false)
@@ -159,18 +180,19 @@ public class GlobalExceptionHandler {
 
     }
 
+
     // Server errors
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ApiResponse handleDataAccessException(DataAccessException exception){
 
-        log.error("Error de servidor de BD {}", exception);
+        log.error("Error de servidor de BD", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(500)
-            .message("Error de base de datos")
-            .data(exception.getMessage())
+            .message("Error en persistencia de datos")
+            .data("Error de servidor de BD: " + exception.getMessage())
             .build();
 
     }
@@ -179,13 +201,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     ApiResponse handleOtherException(Exception exception){
 
-        log.error("Error interno de servidor {}", exception);
+        log.error("Error interno de servidor", exception);
         return ApiResponse
             .builder()
             .flag(false)
             .code(500)
-            .message("Ha ocurrido un error inesperado")
-            .data(exception.getMessage())
+            .message("Ha ocurrido un error inesperado, favor contactar con el soporte adecuado")
+            .data("Error de servidor: " + exception.getMessage())
             .build();
 
     }

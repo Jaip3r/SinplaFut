@@ -41,5 +41,10 @@ public class TeamDAOImpl implements ITeamDAO {
     public void deleteById(Long id) {
         this.teamRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<Team> findByName(String name) {
+        return Optional.ofNullable(this.teamRepository.findTeamByNombre(name));
+    }
     
 }

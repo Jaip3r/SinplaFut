@@ -27,6 +27,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public Team findByName(String name) {
+        var team = this.teamDAO.findByName(name)
+                .orElse(null);
+        return team;
+    }
+
+    @Override
     public Team findById(Long id) {
         var team = this.teamDAO.findById(id)
                 .orElse(null);
