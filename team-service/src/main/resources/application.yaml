@@ -29,6 +29,12 @@ server:
   servlet:
     context-path: /equipo-service # Nombre del microservicio
   port: 8082
+eureka:
+  instance: # Cada instancia del microservicio tendra un identificador unico
+    instance-id: "${spring.application.name}:${random.value}"
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 application:
   services:
