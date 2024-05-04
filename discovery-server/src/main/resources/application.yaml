@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: registry-server
+server:
+  port: 8761
+eureka:
+  client: # Evita que el servicio de registro se registre a si mismo
+    register-with-eureka: false
+    fetch-registry: false
