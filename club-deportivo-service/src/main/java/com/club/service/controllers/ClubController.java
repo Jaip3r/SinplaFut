@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -166,25 +167,27 @@ public class ClubController {
         club.setPais(pais);
         club.setEstadio(estadio);
 
-        // Actualizamos el logo si se provee un archivo
+        // Actualizamos el escudo si se provee un archivo
         if (file != null){
 
-            // Cargamos el archivo con el nuevo logo
-            Map<String, String> result = this.cloudinaryService.uploadFile(file, nombre);
+            Map<String, String> result = new HashMap<String, String>();
 
             // Obtenemos el id de la imagen original
             String original_file_id = club.getLogoId().split("/")[1];
 
             if (!original_file_id.equals(nombre)){
 
-                // Eliminamos el logo relacionado al anterior nombre
-                this.cloudinaryService.delete(original_file_id);
+                // Eliminamos el escudo relacionado al anterior nombre
+                this.cloudinaryService.delete(club.getLogoId());
 
             }
 
-            // Actualizamos con los nuevos datos del club
+            // Cargamos el archivo con el nuevo escudo
+            result = this.cloudinaryService.uploadFile(file, nombre);
+            
             club.setLogoUrl(result.get("secure_url"));
             club.setLogoId(result.get("public_id"));
+            
         }
         
         // Guardamos los cambios    

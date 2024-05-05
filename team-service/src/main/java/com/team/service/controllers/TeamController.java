@@ -1,6 +1,7 @@
 package com.team.service.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -160,8 +161,7 @@ public class TeamController {
         // Actualizamos el escudo si se provee un archivo
         if (file != null){
 
-            // Cargamos el archivo con el nuevo escudo
-            Map<String, String> result = this.cloudinaryService.uploadFile(file, nombre);
+            Map<String, String> result = new HashMap<String, String>();
 
             // Obtenemos el id de la imagen original
             String original_file_id = equipo.getEscudoId().split("/")[1];
@@ -169,11 +169,13 @@ public class TeamController {
             if (!original_file_id.equals(nombre)){
 
                 // Eliminamos el escudo relacionado al anterior nombre
-                this.cloudinaryService.delete(original_file_id);
+                this.cloudinaryService.delete(equipo.getEscudoId());
 
             }
 
-            // Actualizamos con los nuevos datos del equipo
+            // Cargamos el archivo con el nuevo escudo
+            result = this.cloudinaryService.uploadFile(file, nombre);
+            
             equipo.setEscudoUrl(result.get("secure_url"));
             equipo.setEscudoId(result.get("public_id"));
             
