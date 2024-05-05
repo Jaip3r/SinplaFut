@@ -7,7 +7,7 @@ spring:
       connection-timeout: 20000
       maximum-pool-size: 5
   application:
-    name: equipo-service
+    name: team-service
   jpa:
     hibernate:
       ddl-auto: update
@@ -27,7 +27,7 @@ logging:
 
 server:
   servlet:
-    context-path: /equipo-service # Nombre del microservicio
+    context-path: /team-service # Nombre del microservicio
   port: 8082
 eureka:
   instance: # Cada instancia del microservicio tendra un identificador unico

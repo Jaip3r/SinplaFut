@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.club.service.client.TeamClient;
+import com.club.service.controllers.DTO.TeamDTO;
 import com.club.service.models.Club;
 import com.club.service.persistence.IClubDAO;
 import com.club.service.services.ClubService;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class ClubServiceImpl implements ClubService {
 
     private final IClubDAO iClubDAO;
+    private final TeamClient teamClient;
     
     @Override
     public List<Club> findAll() {
@@ -49,6 +52,12 @@ public class ClubServiceImpl implements ClubService {
     @Override
     public void deleteById(Long id) {
         this.iClubDAO.deleteById(id);
+    }
+
+    @Override
+    public List<TeamDTO> findTeamsByClubId(Long id) {
+        // Obtener los equipos - consultando al microservicio respectivo
+        return this.teamClient.findByClub(id);
     }
     
 }

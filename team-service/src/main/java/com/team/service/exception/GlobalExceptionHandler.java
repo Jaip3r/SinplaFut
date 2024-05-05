@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
             .flag(false)
             .code(400)
             .message("Favor proveer el tipo de argumento correcto")
-            .data("Error de tipo de argumento en metodo " + exception.getMessage())
+            .data("Error de tipo de argumento en metodo: " + exception.getMessage())
             .build();
 
     }

@@ -36,39 +36,9 @@ public class CloudinaryServiceImpl implements CloudinaryService{
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public Map<String, String> uploadFile(MultipartFile multipartFile, String filename) throws IOException {
+    public Map<String, String> uploadFile(MultipartFile multipartFile, String public_id) throws IOException {
         
         // Convertimos en archivo para compatibilidad con cloudinary
-        File file = convert(multipartFile);
-
-        // Definimos la configuración de subida
-        Map opciones = ObjectUtils.asMap(
-            "folder", "clubs",
-            "public_id", filename
-        );
-
-        // Subimos el archivo y obtenemos las caracteristicas de cloudinary
-        Map<String, String> result = cloudinary.uploader().upload(file, opciones);
-        if (!Files.deleteIfExists(file.toPath())) { // Eliminamos el archivo en memoria
-            throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
-        }
-
-        return result;
-
-    }
-
-    /**
-     * Método encargado de actualizar un archivo en cloudinary
-     * @param multipartFile archivo
-     * @param public_id identificador del archivo
-     * @return Map<String, String> con las propiedades del nuevo archivo subido
-     * @throws IOException
-     */
-    @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Map<String, String> updateFile(MultipartFile multipartFile, String public_id) throws IOException {
-        
-        // Convertimos el nuevo archivo para compatibilidad con cloudinary
         File file = convert(multipartFile);
 
         // Definimos la configuración de subida
@@ -77,9 +47,9 @@ public class CloudinaryServiceImpl implements CloudinaryService{
             "public_id", public_id
         );
 
-        // Actualizamos el archivo y obtenemos las caracteristicas de cloudinary
+        // Subimos el archivo y obtenemos las caracteristicas de cloudinary
         Map<String, String> result = cloudinary.uploader().upload(file, opciones);
-        if (!Files.deleteIfExists(file.toPath())) {
+        if (!Files.deleteIfExists(file.toPath())) { // Eliminamos el archivo en memoria
             throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
         }
 

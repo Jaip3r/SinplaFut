@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.club.service.controllers.DTO.ClubDTO;
 import com.club.service.controllers.DTO.ClubResponseDTO;
+import com.club.service.controllers.DTO.TeamDTO;
 import com.club.service.controllers.Payload.ApiResponse;
+import com.club.service.exception.AssociatedEntitiesException;
 import com.club.service.exception.ResourceAlreadyExistsException;
 import com.club.service.exception.ResourceNotFoundException;
 import com.club.service.exception.annotation.ValidFile;
@@ -96,7 +98,7 @@ public class ClubController {
 
         // Verificaciones antes de crear el registro
         if (this.clubService.findByStadium(estadio) != null){
-            log.warn("Estadio {} actualmente en uso", estadio);
+            log.warn("Intento de registro de un estadio ya existente: {}", estadio);
             throw new ResourceAlreadyExistsException("Estadio", "Nombre", estadio);
         }
 
@@ -118,13 +120,13 @@ public class ClubController {
             
         this.clubService.save(club);
 
-        log.info("POST: club {}", club.getNombre());
+        log.info("POST: club {}", club);
         return ResponseEntity.ok(ApiResponse
             .builder()
             .flag(true)
             .code(200)
             .message("Club registrado correctamente")
-            .data(club)
+            .data("No data provided")
             .build()
         );
            
@@ -151,10 +153,8 @@ public class ClubController {
             throw new ResourceNotFoundException("Club", "identificador", id);
         }
 
-        String nombreOriginal = club.getNombre();
-
         if (this.clubService.findByStadium(estadio) != null && !estadio.toLowerCase().equals(club.getEstadio().toLowerCase())){
-            log.warn("Estadio {} actualmente en uso", estadio);
+            log.warn("Intento de registro de un estadio ya existente: {}", estadio);
             throw new ResourceAlreadyExistsException("Estadio", "Nombre", estadio);
         }
 
@@ -168,7 +168,21 @@ public class ClubController {
 
         // Actualizamos el logo si se provee un archivo
         if (file != null){
-            Map<String, String> result = this.cloudinaryService.updateFile(file, nombreOriginal.trim());
+
+            // Cargamos el archivo con el nuevo logo
+            Map<String, String> result = this.cloudinaryService.uploadFile(file, nombre);
+
+            // Obtenemos el id de la imagen original
+            String original_file_id = club.getLogoId().split("/")[1];
+
+            if (!original_file_id.equals(nombre)){
+
+                // Eliminamos el logo relacionado al anterior nombre
+                this.cloudinaryService.delete(original_file_id);
+
+            }
+
+            // Actualizamos con los nuevos datos del club
             club.setLogoUrl(result.get("secure_url"));
             club.setLogoId(result.get("public_id"));
         }
@@ -199,6 +213,12 @@ public class ClubController {
             throw new ResourceNotFoundException("Club", "identificador", id);
         }
 
+        // Varificamos que el club no tenga equipos asociados
+        if (this.clubService.findTeamsByClubId(id).size() > 0){
+            log.warn("Intento de eliminación de club con equipos asociados: {}", club.getNombre());
+            throw new AssociatedEntitiesException("Club", club.getNombre(), "equipos");
+        }
+
         // Eliminamos el logo asociado
         this.cloudinaryService.delete(club.getLogoId());
 
@@ -212,6 +232,34 @@ public class ClubController {
             .code(200)
             .message("Club eliminado correctamente")
             .data("No data provided")
+            .build()
+        );
+
+    }
+
+
+    // Comunicación con otros MS
+
+    @GetMapping("/findTeams/{clubId}")
+    public ResponseEntity<ApiResponse> findTeams(@PathVariable Long clubId){
+
+        // Obtenemos el club
+        Club club = this.clubService.findById(clubId);
+
+        if (club == null){
+            log.warn("Club con identificador {} no identificado", clubId);
+            throw new ResourceNotFoundException("Club", "identificador", clubId);
+        }
+
+        // Obtenemos una lista de los equipos asociados a el club
+        List<TeamDTO> teams = this.clubService.findTeamsByClubId(clubId);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Información de equipos obtenida correctamente")
+            .data(teams)
             .build()
         );
 

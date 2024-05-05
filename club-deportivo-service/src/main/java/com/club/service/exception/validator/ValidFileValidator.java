@@ -11,6 +11,7 @@ public class ValidFileValidator implements ConstraintValidator<ValidFile, Multip
 
     private static final long MAX_FILE_SIZE = 3 * 1024 * 1024;
 
+    @SuppressWarnings("null")
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
         
