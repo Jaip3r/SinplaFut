@@ -17,8 +17,8 @@ public record ClubDTO (
     String direccion,
 
     @NotBlank(message = "El telefono del club es obligatorio")
-    @Length(min = 10, message = "El telefono del club debe contener 10 numeros")
-    @Pattern(regexp = "^[1-9]+$", message = "El telefono debe contener solo numeros")
+    @Length(min = 7, message = "El telefono del club debe contener 7 numeros")
+    @Pattern(regexp = "^[0-9]+$", message = "El telefono debe contener solo numeros")
     String telefono,
 
     @NotBlank(message = "La ciudad de residencia del club es obligatoria")

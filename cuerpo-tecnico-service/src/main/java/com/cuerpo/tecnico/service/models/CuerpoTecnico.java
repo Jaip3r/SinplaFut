@@ -60,6 +60,9 @@ public class CuerpoTecnico {
     )
     private String telefono;
 
+    @Column(name = "equipo_id")
+    private Long equipoId;
+
     @Enumerated(value = EnumType.STRING)
     private CuerpoTecnicoType tipo;
 
