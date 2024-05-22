@@ -3,6 +3,17 @@ spring:
     name: api-gateway
   profiles:
     default: eureka-on
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
 server:
   port: 8080
 eureka:
