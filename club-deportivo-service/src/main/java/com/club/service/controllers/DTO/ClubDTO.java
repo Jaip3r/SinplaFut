@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
 public record ClubDTO (
 
     @NotBlank(message = "El nombre del club es obligatorio")
-    @Length(min = 3, max = 30, message = "El nombre del club debe contener entre 3 y 20 caracteres")
+    @Length(min = 3, max = 30, message = "El nombre del club debe contener entre 3 y 30 caracteres")
     @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El nombre del club no debe contener caracteres especiales")
     String nombre,
 
