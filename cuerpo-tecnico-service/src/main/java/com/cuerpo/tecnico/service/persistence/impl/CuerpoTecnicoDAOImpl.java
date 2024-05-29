@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.cuerpo.tecnico.service.models.CuerpoTecnico;
+import com.cuerpo.tecnico.service.models.CuerpoTecnicoType;
 import com.cuerpo.tecnico.service.persistence.ICuerpoTecnicoDAO;
 import com.cuerpo.tecnico.service.persistence.repositories.CuerpoTecnicoRepository;
 
@@ -22,6 +23,16 @@ public class CuerpoTecnicoDAOImpl implements ICuerpoTecnicoDAO {
         return this.cTecnicoRepository.findAll();
     }
 
+    @Override
+    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo) {
+        return this.cTecnicoRepository.findAllByTipo(tipo);
+    }
+
+    @Override
+    public List<CuerpoTecnico> findByEquipo(Long equipo_id) {
+        return this.cTecnicoRepository.findAllByEquipoId(equipo_id);
+    }
+    
     @Override
     public Optional<CuerpoTecnico> findById(Long id) {
         return this.cTecnicoRepository.findById(id);
