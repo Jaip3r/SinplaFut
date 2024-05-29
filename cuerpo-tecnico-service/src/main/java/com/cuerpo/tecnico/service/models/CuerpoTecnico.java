@@ -2,9 +2,6 @@ package com.cuerpo.tecnico.service.models;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +37,6 @@ public class CuerpoTecnico {
     )
     private String apellido;
 
-    @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate fecha_nacimiento;
 
     @Column(
