@@ -23,6 +23,10 @@ public class GatewayConfig {
                     .path("/team-service/team/*")
                     .uri("http://localhost:8082")
                 )
+                .route(route -> route
+                    .path("/cuerpo-tecnico-service/*")
+                    .uri("http://localhost:8083")
+                )
                 .build();
 
     }
@@ -40,6 +44,10 @@ public class GatewayConfig {
                 .route(route -> route
                     .path("/team-service/team/**")
                     .uri("lb://team-service")
+                )
+                .route(route -> route
+                    .path("/cuerpo-tecnico-service/**")
+                    .uri("lb://cuerpo-tecnico-service")
                 )
                 .build();
 
