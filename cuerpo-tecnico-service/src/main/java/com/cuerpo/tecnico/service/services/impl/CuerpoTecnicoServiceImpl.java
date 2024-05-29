@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.cuerpo.tecnico.service.models.CuerpoTecnico;
+import com.cuerpo.tecnico.service.models.CuerpoTecnicoType;
 import com.cuerpo.tecnico.service.persistence.ICuerpoTecnicoDAO;
 import com.cuerpo.tecnico.service.services.CuerpoTecnicoService;
 
@@ -20,6 +21,16 @@ public class CuerpoTecnicoServiceImpl implements CuerpoTecnicoService {
     @Override
     public List<CuerpoTecnico> findAll() {
         return this.iCuerpoTecnicoDAO.findAll();
+    }
+
+    @Override
+    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo) {
+        return this.iCuerpoTecnicoDAO.findByTipo(tipo);
+    }
+
+    @Override
+    public List<CuerpoTecnico> findByEquipo(Long equipo_id) {
+        return this.iCuerpoTecnicoDAO.findByEquipo(equipo_id);
     }
 
     @Override
@@ -46,5 +57,5 @@ public class CuerpoTecnicoServiceImpl implements CuerpoTecnicoService {
     public void deleteById(Long id) {
         this.iCuerpoTecnicoDAO.deleteById(id);
     }
-    
+
 }

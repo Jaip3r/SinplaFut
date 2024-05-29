@@ -4,10 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import com.cuerpo.tecnico.service.models.CuerpoTecnico;
+import com.cuerpo.tecnico.service.models.CuerpoTecnicoType;
 
 public interface CuerpoTecnicoService {
 
     List<CuerpoTecnico> findAll();
+
+    List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo);
+
+    List<CuerpoTecnico> findByEquipo(Long equipo_id);
 
     Optional<CuerpoTecnico> findById(Long id);
 
