@@ -26,6 +26,7 @@ logging:
 server:
   servlet:
     context-path: /cuerpo-tecnico-service # Nombre del microservicio
+  port: 0
 eureka:
   instance: # Cada instancia del microservicio tendra un identificador unico
     instance-id: "${spring.application.name}:${random.value}"
