@@ -9,7 +9,7 @@ public record ClubDTO (
 
     @NotBlank(message = "El nombre del club es obligatorio")
     @Length(min = 3, max = 30, message = "El nombre del club debe contener entre 3 y 30 caracteres")
-    @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El nombre del club no debe contener caracteres especiales")
+    @Pattern(regexp = "^[^\\s][a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]*[^\\s]$", message = "El nombre del club no debe contener caracteres especiales")
     String nombre,
 
     @NotBlank(message = "La dirección del club es obligatoria")

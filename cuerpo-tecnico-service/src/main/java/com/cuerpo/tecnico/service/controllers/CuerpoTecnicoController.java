@@ -291,7 +291,7 @@ public class CuerpoTecnicoController {
     // Endpoints para ser consumidos por otros MS
 
     @GetMapping("/findByEquipo/{equipoId}")
-    public ResponseEntity<?> findByClub(@PathVariable Long equipoId){
+    public ResponseEntity<?> findByEquipo(@PathVariable Long equipoId){
         return ResponseEntity.ok(this.cuerpoTecnicoService.findByEquipo(equipoId)
                         .stream()
                         .map(this::staffToResponseDTO).toList());
