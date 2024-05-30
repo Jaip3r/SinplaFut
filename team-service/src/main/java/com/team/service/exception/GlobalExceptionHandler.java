@@ -115,6 +115,22 @@ public class GlobalExceptionHandler {
             .build();
 
     }
+    
+
+    // Associated entities
+    @ExceptionHandler(AssociatedEntitiesException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse handlerAssociatedEntitiesException(AssociatedEntitiesException exception){
+
+        return ApiResponse
+            .builder()
+            .flag(false)
+            .code(400)
+            .message(exception.getMessage())
+            .data("Acción de eliminación de registro no permitida")
+            .build();
+
+    }
 
 
     // Team already exists

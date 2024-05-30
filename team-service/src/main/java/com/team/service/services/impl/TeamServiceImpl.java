@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.team.service.client.CuerpoTecnicoClient;
+import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.team.service.models.Team;
 import com.team.service.persistence.ITeamDAO;
 import com.team.service.services.TeamService;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class TeamServiceImpl implements TeamService {
 
     private final ITeamDAO teamDAO;
+    private final CuerpoTecnicoClient cTecnicoClient;
 
     @Override
     public List<Team> findAll() {
@@ -48,6 +51,12 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void delete(Long id) {
         this.teamDAO.deleteById(id);
+    }
+
+    @Override
+    public List<CuerpoTecnicoDTO> findStaffByEquipoId(Long equipoId) {
+        // Obtener el staff técnico - consultando al microservicio respectivo
+        return this.cTecnicoClient.findByEquipo(equipoId);
     }
     
 }

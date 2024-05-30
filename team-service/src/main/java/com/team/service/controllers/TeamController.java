@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.team.service.controllers.dtos.TeamDTO;
 import com.team.service.controllers.dtos.TeamResponseDTO;
 import com.team.service.controllers.payload.ApiResponse;
+import com.team.service.exception.AssociatedEntitiesException;
 import com.team.service.exception.ResourceAlreadyExistsException;
 import com.team.service.exception.ResourceNotFoundException;
 import com.team.service.exception.annotation.ValidFile;
@@ -207,6 +209,12 @@ public class TeamController {
             throw new ResourceNotFoundException("Equipo", "identificador", id);
         }
 
+        // Varificamos que el equipo no tenga jugadores o staff técnico asociados
+        if (this.teamService.findStaffByEquipoId(id).size() > 0){
+            log.warn("Intento de eliminación de club con jugadores y staff asociados: {}", equipo.getNombre());
+            throw new AssociatedEntitiesException("Equipo", equipo.getNombre(), "staff-jugadores");
+        }
+
         // Eliminamos el escudo asociado
         this.cloudinaryService.delete(equipo.getEscudoId());
 
@@ -220,6 +228,34 @@ public class TeamController {
             .code(200)
             .message("Equipo eliminado correctamente")
             .data("No data provided")
+            .build()
+        );
+
+    }
+
+
+    // Comunicación con otros MS
+    
+    @GetMapping("findStaff/{equipoId}")
+    public ResponseEntity<ApiResponse> findStaff(@PathVariable Long equipoId){
+
+        // Obtenemos el equipo
+        Team team = this.teamService.findById(equipoId);
+
+        if (team == null){
+            log.warn("Equipo con identificador {} no identificado", equipoId);
+            throw new ResourceNotFoundException("Equipo", "identificador", equipoId);
+        }
+
+        // Obtenemos la lista del staff técnico asociado al club
+        List<CuerpoTecnicoDTO> lTecnicoDTOs = this.teamService.findStaffByEquipoId(equipoId);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Información de cuerpo técnico obtenida correctamente")
+            .data(lTecnicoDTOs)
             .build()
         );
 
