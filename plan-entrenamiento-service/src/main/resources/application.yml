@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/plan_entrenamiento_db
+    username: postgres
+    password: 8hicpjnpMjUTP5e@
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+  application:
+    name: plan-entrenamiento-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG # Registra las consultas SQL ejecutadas por Hibernate en el nivel de depuración (DEBUG).
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE # Registra los enlaces de parámetros en las consultas SQL en el nivel de traza (TRACE).
+
+server:
+  servlet:
+    context-path: /plan-entrenamiento-service # Nombre del microservicio
+  port: 0
+eureka:
+  instance: # Cada instancia del microservicio tendra un identificador unico
+    instance-id: "${spring.application.name}:${random.value}"
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
