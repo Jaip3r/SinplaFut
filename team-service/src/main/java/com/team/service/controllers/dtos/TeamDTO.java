@@ -17,7 +17,7 @@ public record TeamDTO(
 
     @NotBlank(message = "El telefono del equipo es obligatorio")
     @Length(min = 10, message = "El telefono del equipo debe contener 10 numeros")
-    @Pattern(regexp = "^[1-9]+$", message = "El telefono del equipo debe contener solo numeros")
+    @Pattern(regexp = "^[0-9]+$", message = "El telefono del equipo debe contener solo numeros")
     String telefono,
 
     @NotBlank(message = "La categoria del equipo es obligatoria")
