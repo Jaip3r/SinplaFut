@@ -32,6 +32,9 @@ public class Lesion {
     )
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String nombre;
+
     @Column(nullable = false)
     private LocalDate fecha_inicio;
 
