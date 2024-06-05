@@ -13,7 +13,9 @@ public record TeamResponseDTO (
 
     String categoria,
 
-    String escudo
+    String escudo,
+
+    Long clubId
 
 ){
     
