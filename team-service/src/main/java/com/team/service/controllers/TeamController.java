@@ -284,6 +284,7 @@ public class TeamController {
             .telefono(team.getTelefono())
             .categoria(team.getCategoria().toString().toLowerCase())
             .escudo(team.getEscudoUrl())
+            .clubId(team.getClubId())
             .build();
 
     }
