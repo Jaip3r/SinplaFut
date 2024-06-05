@@ -71,5 +71,8 @@ public class SesionEntrenamiento {
         )
     )
     private List<MetodoEntrenamiento> metodos;
+
+    @Column(name = "equipo_id")
+    private Long equipoId;
     
 }
