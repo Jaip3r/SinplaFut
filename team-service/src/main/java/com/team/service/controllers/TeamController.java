@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
+import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
 import com.team.service.controllers.dtos.TeamDTO;
 import com.team.service.controllers.dtos.TeamResponseDTO;
 import com.team.service.controllers.payload.ApiResponse;
@@ -261,6 +262,30 @@ public class TeamController {
 
     }
 
+    @GetMapping("findSesiones/{equipoId}")
+    public ResponseEntity<ApiResponse> findSesiones(@PathVariable Long equipoId){
+
+        // Obtenemos el equipo
+        Team team = this.teamService.findById(equipoId);
+
+        if (team == null){
+            log.warn("Equipo con identificador {} no identificado", equipoId);
+            throw new ResourceNotFoundException("Equipo", "identificador", equipoId);
+        }
+
+        // Obtenemos la lista de sesiones de entrenamiento asociadas al club
+        List<PlanEntrenamientoDTO> pEntrenamientoDTO = this.teamService.findSesionesByEquipoId(equipoId);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Información de sesiones de entrenamiento obtenida correctamente")
+            .data(pEntrenamientoDTO)
+            .build()
+        );
+
+    }
 
     // Endpoints para ser consumidos por otros MS
 
