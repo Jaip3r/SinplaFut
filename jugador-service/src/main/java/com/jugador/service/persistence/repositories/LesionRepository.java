@@ -7,7 +7,7 @@ import com.jugador.service.models.Lesion;
 
 public interface LesionRepository extends JpaRepository<Lesion, Long> {
 
-    // Query methods to find an especific technical staff
+    // Query methods to find an especific injury
     Lesion findByNombre(String nombre);
     
 }

@@ -17,7 +17,7 @@ import jakarta.validation.Payload;
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface ValidTipo {
 
-     String message() default "Tipo de integrante de cuerpo técnico no válido";
+    String message() default "Tipo de integrante de cuerpo técnico no válido";
 
     Class<?>[] groups() default { };
 

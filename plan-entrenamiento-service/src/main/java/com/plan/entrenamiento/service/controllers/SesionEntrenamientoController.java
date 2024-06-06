@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,10 +78,53 @@ public class SesionEntrenamientoController {
 
     }
 
+    @GetMapping("/findMethods/{id}")
+    public ResponseEntity<ApiResponse> getMethods(@PathVariable Long id) {
+        
+        // Obtenemos la sesión de entrenamiento 
+        Optional<SesionEntrenamiento> sesion = this.service.findById(id);
+
+        // Verificaciones de identidad
+        if (sesion.isEmpty()){
+            log.warn("Sesion con identificador {} no identificado", id);
+            throw new ResourceNotFoundException("Sesion", "identificador", id);
+        }
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Info obtenida correctamente")
+            .data(sesion.get().getMetodos())
+            .build()
+        );
+
+    }
+
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createSesion(@RequestBody @Valid SesionEntrenamientoDTO sDto){
 
-        // Con
+        // Convertimos los metodos a la entidad correspondiente
+        List<MetodoEntrenamiento> mList = sDto.metodos()
+                .stream().map(this::responseToMetodoEntrenamiento).toList();
+
+        // Verificamos que la duracion de los metodo no supere la de la sesión
+        int duracionTotalMetodos = mList.stream()
+                                    .mapToInt(MetodoEntrenamiento::getDuracion)
+                                    .sum();
+
+        if (duracionTotalMetodos > sDto.duracion()){
+
+            return ResponseEntity.ok(ApiResponse
+                .builder()
+                .flag(false)
+                .code(400)
+                .message("La duración total de los métodos de entrenamiento supera la de la sesión")
+                .data("Error de validación")
+                .build()
+            );
+
+        }
 
         // Creamos la nueva sesión de entrenamiento con la información proporcionada
         SesionEntrenamiento sEntrenamiento = SesionEntrenamiento
@@ -91,8 +135,10 @@ public class SesionEntrenamientoController {
                     .hora(sDto.hora())
                     .duracion(sDto.duracion())
                     .tipo_sesion(TipoSesionEntrenamiento.valueOf(sDto.tipo().toUpperCase()))
+                    .metodos(mList)
                     .build();
         
+        // Registramos los cambios
         this.service.save(sEntrenamiento);
 
         log.info("POST: sesion {}", sEntrenamiento);
@@ -105,6 +151,43 @@ public class SesionEntrenamientoController {
             .build()
         );
 
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse> deleteSesion(@PathVariable Long id){
+
+        // Obtenemos la sesión de entrenamiento 
+        Optional<SesionEntrenamiento> sesion = this.service.findById(id);
+
+        // Verificaciones de identidad
+        if (sesion.isEmpty()){
+            log.warn("Sesion con identificador {} no identificado", id);
+            throw new ResourceNotFoundException("Sesion", "identificador", id);
+        }
+
+        // Eliminamos la sesión de entrenamiento
+        this.service.deleteById(id);
+
+        log.info("DELETE: Sesion de entrenamiento con identificador {}", id);
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Sesión de entrenamiento eliminada correctamente")
+            .data("No data provided")
+            .build()
+        );
+
+    }
+
+
+    // Endpoints para ser consumidos por otros MS
+
+    @GetMapping("/findByEquipo/{equipoId}")
+    public ResponseEntity<?> findByEquipo(@PathVariable Long equipoId){
+        return ResponseEntity.ok(this.service.findByEquipo(equipoId)
+                        .stream()
+                        .map(this::sesionToResponseDTO).toList());
     }
 
     // Converter methods
