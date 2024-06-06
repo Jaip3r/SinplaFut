@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.plan.entrenamiento.service.controllers.dtos.MetodoEntrenamientoResponseDTO;
 import com.plan.entrenamiento.service.controllers.dtos.SesionEntrenamientoDTO;
 import com.plan.entrenamiento.service.controllers.dtos.SesionEntrenamientoResponseDTO;
 import com.plan.entrenamiento.service.controllers.payload.ApiResponse;
 import com.plan.entrenamiento.service.exception.ResourceNotFoundException;
+import com.plan.entrenamiento.service.models.MetodoEntrenamiento;
 import com.plan.entrenamiento.service.models.SesionEntrenamiento;
+import com.plan.entrenamiento.service.models.TipoCarga;
+import com.plan.entrenamiento.service.models.TipoIntensidad;
 import com.plan.entrenamiento.service.models.TipoSesionEntrenamiento;
 import com.plan.entrenamiento.service.services.SesionEntrenamientoService;
 
@@ -76,6 +80,8 @@ public class SesionEntrenamientoController {
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createSesion(@RequestBody @Valid SesionEntrenamientoDTO sDto){
 
+        // Con
+
         // Creamos la nueva sesión de entrenamiento con la información proporcionada
         SesionEntrenamiento sEntrenamiento = SesionEntrenamiento
                     .builder()
@@ -114,6 +120,19 @@ public class SesionEntrenamientoController {
                 .duracion(sesion.getDuracion())
                 .tipo_sesion(sesion.getTipo_sesion().toString().toLowerCase())
                 .equipoId(sesion.getEquipoId())
+                .build();
+
+    }
+
+    private MetodoEntrenamiento responseToMetodoEntrenamiento(MetodoEntrenamientoResponseDTO metodo){
+
+        return MetodoEntrenamiento.builder()
+                .id(metodo.getId())
+                .nombre(metodo.getNombre())
+                .descripcion(metodo.getDescripcion())
+                .carga(TipoCarga.valueOf(metodo.getCarga().toUpperCase()))
+                .intensidad(TipoIntensidad.valueOf(metodo.getIntensidad().toUpperCase()))
+                .duracion(metodo.getDuracion())
                 .build();
 
     }

@@ -92,7 +92,7 @@ public class MetodoEntrenamientoController {
                     .nombre(mDto.nombre())
                     .descripcion(mDto.descripcion())
                     .carga(TipoCarga.valueOf(mDto.carga().toUpperCase()))
-                    .instensidad(TipoIntensidad.valueOf(mDto.intensidad().toUpperCase()))
+                    .intensidad(TipoIntensidad.valueOf(mDto.intensidad().toUpperCase()))
                     .duracion(mDto.duracion())
                     .build();
         
@@ -134,7 +134,7 @@ public class MetodoEntrenamientoController {
         mEntrenamiento.setNombre(mDto.nombre());
         mEntrenamiento.setDescripcion(mDto.descripcion());
         mEntrenamiento.setCarga(TipoCarga.valueOf(mDto.carga().toUpperCase()));
-        mEntrenamiento.setInstensidad(TipoIntensidad.valueOf(mDto.intensidad().toUpperCase()));
+        mEntrenamiento.setIntensidad(TipoIntensidad.valueOf(mDto.intensidad().toUpperCase()));
         
         // Guardamos los cambios
         this.mService.save(mEntrenamiento);
@@ -188,7 +188,7 @@ public class MetodoEntrenamientoController {
                 .nombre(metodo.getNombre())
                 .descripcion(metodo.getDescripcion())
                 .carga(metodo.getCarga().toString().toLowerCase())
-                .intensidad(metodo.getInstensidad().toString().toLowerCase())
+                .intensidad(metodo.getIntensidad().toString().toLowerCase())
                 .duracion(metodo.getDuracion())
                 .build();
 

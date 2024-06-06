@@ -1,6 +1,7 @@
 package com.plan.entrenamiento.service.controllers.dtos;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -46,7 +47,10 @@ public record SesionEntrenamientoDTO(
     @NotNull(message = "El identificador del equipo es obligatorio")
     @Positive(message = "El identificador del equipo no puede ser cero 0 negativo")
     @Digits(integer = Integer.MAX_VALUE, fraction = 0, message = "El identificador del equipo debe ser un número entero positivo")
-    Long equipoId
+    Long equipoId,
+
+    @NotNull(message = "Los métodos de entrenamiento no pueden ser nulos")
+    List<MetodoEntrenamientoResponseDTO> metodos
 
 ) {
 

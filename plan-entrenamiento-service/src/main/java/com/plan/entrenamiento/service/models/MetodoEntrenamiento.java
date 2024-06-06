@@ -44,7 +44,7 @@ public class MetodoEntrenamiento {
     private TipoCarga carga;
 
     @Enumerated(value = EnumType.STRING)
-    private TipoIntensidad instensidad;
+    private TipoIntensidad intensidad;
 
     @Column(nullable = false)
     private int duracion;
