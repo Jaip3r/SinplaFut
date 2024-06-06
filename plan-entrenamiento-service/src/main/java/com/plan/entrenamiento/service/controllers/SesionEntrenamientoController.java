@@ -135,6 +135,7 @@ public class SesionEntrenamientoController {
                     .hora(sDto.hora())
                     .duracion(sDto.duracion())
                     .tipo_sesion(TipoSesionEntrenamiento.valueOf(sDto.tipo().toUpperCase()))
+                    .equipoId(sDto.equipoId())
                     .metodos(mList)
                     .build();
         
@@ -153,7 +154,7 @@ public class SesionEntrenamientoController {
 
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteSesion(@PathVariable Long id){
 
         // Obtenemos la sesión de entrenamiento 

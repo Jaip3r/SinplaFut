@@ -16,7 +16,7 @@ public class ValidDateValidator implements ConstraintValidator<ValidDate, LocalD
             return false;
         }
 
-        if (fecha.isAfter(LocalDate.now())) {
+        if (fecha.isBefore(LocalDate.now())) {
             return false;
         }
 

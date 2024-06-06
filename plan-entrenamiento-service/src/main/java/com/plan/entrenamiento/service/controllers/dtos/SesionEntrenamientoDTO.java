@@ -10,7 +10,6 @@ import com.plan.entrenamiento.service.exception.annotation.ValidDate;
 import com.plan.entrenamiento.service.exception.annotation.ValidTipoSesion;
 
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -33,7 +32,6 @@ public record SesionEntrenamientoDTO(
     LocalDate fecha_inicio,
 
     @NotBlank(message = "La hora de inicio de la sesión de entrenamiento es obligatoria")
-    @Email(message = "Favor proporcionar una dirección de correo válida")
     String hora,
 
     @NotNull(message = "La duración de la sesión de entrenamiento es obligatoria")
@@ -41,7 +39,7 @@ public record SesionEntrenamientoDTO(
     @Digits(integer = Integer.MAX_VALUE, fraction = 0, message = "La duración se la sesión debe ser un número entero positivo")
     int duracion,
 
-    @ValidTipoSesion(message = "Favor proporcionar una categoria de cuerpo técnico válida")
+    @ValidTipoSesion(message = "Favor proporcionar un tipo de sesión de entrenamiento válido")
     String tipo,
 
     @NotNull(message = "El identificador del equipo es obligatorio")
