@@ -78,29 +78,6 @@ public class SesionEntrenamientoController {
 
     }
 
-    @GetMapping("/findMethods/{id}")
-    public ResponseEntity<ApiResponse> getMethods(@PathVariable Long id) {
-        
-        // Obtenemos la sesión de entrenamiento 
-        Optional<SesionEntrenamiento> sesion = this.service.findById(id);
-
-        // Verificaciones de identidad
-        if (sesion.isEmpty()){
-            log.warn("Sesion con identificador {} no identificado", id);
-            throw new ResourceNotFoundException("Sesion", "identificador", id);
-        }
-
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(sesion.get().getMetodos())
-            .build()
-        );
-
-    }
-
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createSesion(@RequestBody @Valid SesionEntrenamientoDTO sDto){
 
@@ -204,6 +181,7 @@ public class SesionEntrenamientoController {
                 .duracion(sesion.getDuracion())
                 .tipo_sesion(sesion.getTipo_sesion().toString().toLowerCase())
                 .equipoId(sesion.getEquipoId())
+                .metodos(sesion.getMetodos())
                 .build();
 
     }

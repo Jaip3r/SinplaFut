@@ -1,5 +1,9 @@
 package com.plan.entrenamiento.service.controllers.dtos;
 
+import java.util.List;
+
+import com.plan.entrenamiento.service.models.MetodoEntrenamiento;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,5 +28,7 @@ public class SesionEntrenamientoResponseDTO {
     private String tipo_sesion;
 
     private Long equipoId;
+
+    List<MetodoEntrenamiento> metodos;
 
 }
