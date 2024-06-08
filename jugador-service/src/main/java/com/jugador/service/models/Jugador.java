@@ -48,8 +48,11 @@ public class Jugador {
 
     private LocalDate fecha_nacimiento;
 
-    @Column(nullable = false)
-    private String telefono;
+    @Column(nullable = false, unique = true)
+    private String documento;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(nullable = false)
     private String direccion;
@@ -57,22 +60,11 @@ public class Jugador {
     @Column(nullable = false)
     private String celular;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     @Enumerated(value = EnumType.STRING)
     private EstadoJugador estado;
     
     @Column(nullable = false)
     private int numero_camiseta;
-
-    private String camiseta;
-
-    private String pantaloneta;
-
-    private String zapatos;
-
-    private String medias;
 
     @Column(nullable = false)
     private String tipo_sangre;
