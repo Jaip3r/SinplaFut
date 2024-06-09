@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.jugador.service.exception.annotation.ValidDate;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -14,10 +16,10 @@ public record LesionDTO(
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚüÜñÑ]+)*$", message = "El nombre de la lesión no debe contener carácteres especiales")
     String nombre,
 
-    // valid date
+    @ValidDate(message = "Favor proporcionar una fecha de inicio válida")
     LocalDate fecha_inicio,
 
-    // valid date
+    @ValidDate(message = "Favor proporcionar una fecha de fin válida")
     LocalDate fecha_fin,
 
     @NotBlank(message = "El tratamiento de la lesión es obligatorio")
