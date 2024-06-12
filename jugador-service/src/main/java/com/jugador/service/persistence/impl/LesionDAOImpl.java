@@ -3,12 +3,15 @@ package com.jugador.service.persistence.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 import com.jugador.service.models.Lesion;
 import com.jugador.service.persistence.ILesionDAO;
 import com.jugador.service.persistence.repositories.LesionRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Component
 @RequiredArgsConstructor
 public class LesionDAOImpl implements ILesionDAO {
 
