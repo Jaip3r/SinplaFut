@@ -3,12 +3,15 @@ package com.jugador.service.services.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.jugador.service.models.Lesion;
 import com.jugador.service.persistence.ILesionDAO;
 import com.jugador.service.services.LesionService;
 
 import lombok.RequiredArgsConstructor;
 
+@Service
 @RequiredArgsConstructor
 public class LesionServiceImpl implements LesionService {
 
