@@ -2,12 +2,14 @@ package com.jugador.service.models;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,27 +20,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Lesion {
+@Table(name = "jugador_lesion")
+public class JugadorLesion {
     
     @Id
     @SequenceGenerator(
-        name = "lesion_sequence",
-        sequenceName = "lesion_sequence",
+        name = "jugador_lesion_sequence",
+        sequenceName = "jugador_lesion_sequence",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "lesion_sequence"
+        generator = "jugador_lesion_sequence"
     )
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String nombre;
+    @ManyToOne(targetEntity = Jugador.class)
+    @JoinColumn(name = "jugador_id")
+    private Jugador jugador;
 
-    @Column(nullable = false)
-    private String tratamiento;
+    @ManyToOne(targetEntity = Lesion.class)
+    @JoinColumn(name = "lesion_id")
+    private Lesion lesion;
 
-    @Column(nullable = false)
-    private String observaciones;
+    private LocalDate fecha_inicio;
+
+    private LocalDate fecha_fin;
 
 }
