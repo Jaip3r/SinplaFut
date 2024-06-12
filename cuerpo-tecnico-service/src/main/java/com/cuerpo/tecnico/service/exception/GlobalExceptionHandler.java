@@ -91,8 +91,22 @@ public class GlobalExceptionHandler {
 
     }
 
+    // Staff already active
+    @ExceptionHandler(MemberActiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse handlerMemberActiveException(MemberActiveException exception){
+        
+        return ApiResponse
+            .builder()
+            .flag(false)
+            .code(400)
+            .message(exception.getMessage())
+            .data("Integrante activo")
+            .build();
 
-    // Stadium already exists
+    }
+
+    // Staff already exists
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse handlerResourceAlreadyExistsException(ResourceAlreadyExistsException exception){

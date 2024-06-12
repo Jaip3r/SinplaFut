@@ -19,12 +19,12 @@ public record CuerpoTecnicoDTO(
 
     @NotBlank(message = "El nombre del integrante del cuerpo técnico es obligatorio")
     @Length(min = 2, max = 40, message = "El nombre del integrante debe contener entre 2 y 40 carácteres")
-    @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El nombre del integrante no debe contener carácteres especiales")
+    @Pattern(regexp = "^[^\\s][a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]*[^\\s]$", message = "El nombre del integrante no debe contener carácteres especiales")
     String nombre,
 
     @NotBlank(message = "El apellido del integrante del cuerpo técnico es obligatorio")
     @Length(min = 2, max = 45, message = "El apellido del integrante debe contener entre 2 y 45 carácteres")
-    @Pattern(regexp = "^(?! )[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$", message = "El apellido del integrante no debe contener carácteres especiales")
+    @Pattern(regexp = "^[^\\s][a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]*[^\\s]$", message = "El apellido del integrante no debe contener carácteres especiales")
     String apellido,
 
     @NotBlank(message = "El email del integrante del cuerpo técnico es obligatorio")
@@ -40,9 +40,9 @@ public record CuerpoTecnicoDTO(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     LocalDate fecha_nacimiento,
 
-    @NotBlank(message = "El telefono del integrante del cuerpo tecnico es obligatorio")
-    @Length(min = 10, message = "El telefono del integrante debe contener 10 numeros")
-    @Pattern(regexp = "^[0-9]+$", message = "El telefono del integrante debe contener solo numeros")
+    @NotBlank(message = "El teléfono celular del integrante del cuerpo técnico es obligatorio")
+    @Length(min = 10, message = "El teléfono celular del integrante debe contener 10 números")
+    @Pattern(regexp = "^[0-9]+$", message = "El teléfono del integrante debe contener solo números")
     String telefono,
 
     @NotNull(message = "El identificador del equipo es obligatorio")

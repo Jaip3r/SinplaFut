@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cuerpo.tecnico.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.cuerpo.tecnico.service.controllers.dtos.CuerpoTecnicoResponseDTO;
 import com.cuerpo.tecnico.service.controllers.payload.ApiResponse;
+import com.cuerpo.tecnico.service.exception.MemberActiveException;
 import com.cuerpo.tecnico.service.exception.ResourceAlreadyExistsException;
 import com.cuerpo.tecnico.service.exception.ResourceNotFoundException;
 import com.cuerpo.tecnico.service.models.CuerpoTecnico;
@@ -66,7 +67,7 @@ public class CuerpoTecnicoController {
                     .flag(false)
                     .code(400)
                     .message("Tipo de staff técnico inválido")
-                    .data("no message provided")
+                    .data("no data provided")
                     .build()
             );
         }
@@ -173,6 +174,11 @@ public class CuerpoTecnicoController {
             throw new ResourceAlreadyExistsException("Staff", "documento", cTecnicoDTO.documento());
         }
 
+        if (cOptional.get().getEquipoId() != null && !cOptional.get().getEquipoId().equals(cTecnicoDTO.equipoId())){
+            log.warn("Intento de cambio de equipo para un integrante actualmente en funciones: equipo {}, id {}", cOptional.get().getEquipoId(), cOptional.get().getId());
+            throw new MemberActiveException(cOptional.get().getNombre(), cOptional.get().getApellido());
+        }
+
         // Actualizamos la data del integrante
         CuerpoTecnico cTecnico = cOptional.get();
 
@@ -219,14 +225,14 @@ public class CuerpoTecnicoController {
         // En caso de intentar finalizar la vigencia de un integrante ya desvinculado
         if (cTecnico.getEquipoId() == null) {
             log.info("Intento de finalizar la vigencia de un integrante sin ninguna afiliación registada: {} {}", cTecnico.getNombre(), cTecnico.getApellido());
-            return ResponseEntity.ok(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("El integrante especificado no se encuentra vinculado a ningún equipo")
-                .data("No data provided")
-                .build()
-            );
+            return ResponseEntity.badRequest().body(ApiResponse
+                                .builder()
+                                .flag(false)
+                                .code(400)
+                                .message("El integrante especificado no se encuentra vinculado a ningún equipo")
+                                .data("No data provided")
+                                .build()
+                            );
         }
 
         // Desvinculamos al integrante en especifico
@@ -262,14 +268,12 @@ public class CuerpoTecnicoController {
         // No permitimos la eliminación de un integrante con vinculación vigente
         if (staff.get().getEquipoId() != null){
             log.info("Intento de eliminación de integrante con vinculación vigente con identificador {}", id);
-            return ResponseEntity.ok(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("El integrante aún se encuentra vinculado a un equipo")
-                .data("No data provided")
-                .build()
-            );
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                                .flag(false)
+                                .code(400)
+                                .message("El integrante aún se encuentra vinculado a un equipo")
+                                .data("No data provided")
+                                .build());
         }
 
         // Eliminamos al integrante del cuerpo técnico en cuestión
