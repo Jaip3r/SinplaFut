@@ -1,6 +1,5 @@
 package com.jugador.service.models;
 
-import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
