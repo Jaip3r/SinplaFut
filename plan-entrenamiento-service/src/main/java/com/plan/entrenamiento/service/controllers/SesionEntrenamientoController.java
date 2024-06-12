@@ -92,7 +92,7 @@ public class SesionEntrenamientoController {
 
         if (duracionTotalMetodos > sDto.duracion()){
 
-            return ResponseEntity.ok(ApiResponse
+            return ResponseEntity.badRequest().body(ApiResponse
                 .builder()
                 .flag(false)
                 .code(400)
