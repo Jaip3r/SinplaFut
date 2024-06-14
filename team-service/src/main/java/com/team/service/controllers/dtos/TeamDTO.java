@@ -11,13 +11,13 @@ import jakarta.validation.constraints.Positive;
 public record TeamDTO(
 
     @NotBlank(message = "El nombre del equipo es obligatorio")
-    @Length(min = 3, max = 30, message = "El nombre del equipo debe contener entre 3 y 20 caracteres")
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9]+( [a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9]+)*$", message = "El nombre del equipo no debe contener caracteres especiales")
+    @Length(min = 3, max = 30, message = "El nombre del equipo debe contener entre 3 y 20 carácteres")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9]+( [a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9]+)*$", message = "El nombre del equipo no debe contener carácteres especiales")
     String nombre,
 
-    @NotBlank(message = "El telefono del equipo es obligatorio")
-    @Length(min = 7, message = "El telefono del equipo debe contener 7 numeros")
-    @Pattern(regexp = "^[0-9]+$", message = "El telefono del equipo debe contener solo numeros")
+    @NotBlank(message = "El teléfono del equipo es obligatorio")
+    @Length(min = 7, message = "El teléfono del equipo debe contener 7 números")
+    @Pattern(regexp = "^[0-9]+$", message = "El teléfono del equipo debe contener solo números")
     String telefono,
 
     @NotBlank(message = "La categoria del equipo es obligatoria")

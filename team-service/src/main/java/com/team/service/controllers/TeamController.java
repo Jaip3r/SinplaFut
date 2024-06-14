@@ -44,26 +44,6 @@ public class TeamController {
     private final TeamService teamService;
     private final CloudinaryService cloudinaryService;
 
-    @GetMapping("/findAll")
-    public ResponseEntity<ApiResponse> getTeams(){
-
-        // Obtenemos una lista de todos los clubes registrados
-        List<TeamResponseDTO> teamList = this.teamService.findAll()
-                .stream()
-                .map(this::teamToResponseDTO)
-                .toList();
-        
-        return ResponseEntity.ok(
-            ApiResponse.builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(teamList)
-            .build()
-        );
-
-    }
-
     @GetMapping("/find/{id}")
     public ResponseEntity<ApiResponse> getTeamById(@PathVariable Long id){
         
