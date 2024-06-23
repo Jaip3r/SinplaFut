@@ -2,12 +2,12 @@ package com.jugador.service.exception.validator;
 
 import java.util.List;
 
-import com.jugador.service.exception.annotation.ValidTipoSangre;
+import com.jugador.service.exception.annotation.ValidEstado;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class ValidEstadoValidator implements ConstraintValidator<ValidTipoSangre, String>{
+public class ValidEstadoValidator implements ConstraintValidator<ValidEstado, String>{
 
     private List<String> validEstados = List.of("LESIONADO", "ACTIVO", "INACTIVO", "RETIRADO");
 

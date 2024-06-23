@@ -21,7 +21,7 @@ public class ValidBirthDateValidator implements ConstraintValidator<ValidBirthDa
             return false;
         }
 
-        if (Period.between(fecha, LocalDate.now()).getYears() < 16){
+        if (Period.between(fecha, LocalDate.now()).getYears() < 16 || Period.between(fecha, LocalDate.now()).getYears() > 55){
             return false;
         }
 

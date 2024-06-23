@@ -6,13 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.jugador.service.exception.validator.ValidTipoSangreValidator;
+import com.jugador.service.exception.validator.ValidEstadoValidator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = ValidTipoSangreValidator.class)
+@Constraint(validatedBy = ValidEstadoValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface ValidEstado {
