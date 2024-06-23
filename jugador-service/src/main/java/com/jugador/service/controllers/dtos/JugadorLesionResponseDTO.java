@@ -7,14 +7,12 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class LesionResponseDTO {
+public class JugadorLesionResponseDTO {
 
     private Long id;
 
-    private String nombre;
+    private String fecha_inicio;
 
-    private String tratamiento;
-
-    private String observaciones;
+    private String fecha_fin;
     
 }
