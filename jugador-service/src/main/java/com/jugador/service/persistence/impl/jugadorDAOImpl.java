@@ -24,8 +24,8 @@ public class jugadorDAOImpl implements IJugadorDAO {
     }
 
     @Override
-    public List<Jugador> findByEstado(EstadoJugador estado) {
-        return this.jugadorRepository.findAllByEstado(estado);
+    public List<Jugador> findByEstado(EstadoJugador estado, Long equipoId) {
+        return this.jugadorRepository.findAllByEstadoAndEquipoId(estado, equipoId);
     }
 
     @Override

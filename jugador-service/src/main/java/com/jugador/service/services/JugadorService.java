@@ -12,7 +12,7 @@ public interface JugadorService {
 
     List<Jugador> findByEquipo(Long equipo_id);
 
-    List<Jugador> findByEstado(EstadoJugador estado);
+    List<Jugador> findByEstado(EstadoJugador estado, Long equipoId);
 
     Optional<Jugador> findByDocumento(String documento);
 

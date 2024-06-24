@@ -467,14 +467,10 @@ public class JugadorController {
         EstadoJugador eJugador = EstadoJugador.valueOf(estado.toUpperCase());
 
         // Obtenemos la lista de los jugadores de acuerdo a su estado
-        List<JugadorResponseDTO> jList = this.jugadorService.findByEstado(eJugador)
+        List<JugadorResponseDTO> jList = this.jugadorService.findByEstado(eJugador, equipoId)
                 .stream().map(this::jugadorToResponseDTO).toList();
-        
-        // Filtramos los jugadores por el equipo especifico
-        List<JugadorResponseDTO> jListFiltrada = jList.stream()
-                .filter(jugador -> jugador.getId().equals(equipoId)).toList();
 
-        return ResponseEntity.ok(jListFiltrada);
+        return ResponseEntity.ok(jList);
 
     }
 

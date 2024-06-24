@@ -24,8 +24,8 @@ public class JugadorServiceImpl implements JugadorService {
     }
 
     @Override
-    public List<Jugador> findByEstado(EstadoJugador estado) {
-        return this.iJugadorDAO.findByEstado(estado);
+    public List<Jugador> findByEstado(EstadoJugador estado, Long equipoId) {
+        return this.iJugadorDAO.findByEstado(estado, equipoId);
     }
 
     @Override

@@ -10,7 +10,7 @@ public interface IJugadorDAO {
 
     List<Jugador> findAll();
 
-    List<Jugador> findByEstado(EstadoJugador estado);
+    List<Jugador> findByEstado(EstadoJugador estado, Long equipoId);
 
     List<Jugador> findByEquipo(Long equipo_id);
 

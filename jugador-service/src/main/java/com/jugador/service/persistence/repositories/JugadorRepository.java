@@ -14,7 +14,7 @@ public interface JugadorRepository extends JpaRepository<Jugador, Long>{
 
     Jugador findByDocumento(String documento);
 
-    List<Jugador> findAllByEstado(EstadoJugador estado);
+    List<Jugador> findAllByEstadoAndEquipoId(EstadoJugador estado, Long equipoId);
 
     List<Jugador> findByEquipoId(Long equipo_id);
     
