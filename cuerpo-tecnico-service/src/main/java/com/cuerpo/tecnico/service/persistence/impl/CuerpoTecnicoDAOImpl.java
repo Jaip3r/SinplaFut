@@ -32,20 +32,20 @@ public class CuerpoTecnicoDAOImpl implements ICuerpoTecnicoDAO {
     public List<CuerpoTecnico> findByEquipo(Long equipo_id) {
         return this.cTecnicoRepository.findAllByEquipoId(equipo_id);
     }
+
+    @Override
+    public List<CuerpoTecnico> findAllByEmailOrDocumento(String email, String documento) {
+        return this.cTecnicoRepository.findAllByEmailOrDocumento(email, documento);
+    }
+
+    @Override
+    public Optional<CuerpoTecnico> findByEmailOrDocumento(String email, String documento) {
+        return this.cTecnicoRepository.findFirstByEmailOrDocumento(email, documento);
+    }
     
     @Override
     public Optional<CuerpoTecnico> findById(Long id) {
         return this.cTecnicoRepository.findById(id);
-    }
-
-    @Override
-    public Optional<CuerpoTecnico> findByDocumento(String documento) {
-        return Optional.ofNullable(this.cTecnicoRepository.findByDocumento(documento));
-    }
-
-    @Override
-    public Optional<CuerpoTecnico> findByEmail(String email) {
-        return Optional.ofNullable(this.cTecnicoRepository.findByEmail(email));
     }
 
     @Override

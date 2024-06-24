@@ -14,11 +14,11 @@ public interface CuerpoTecnicoService {
 
     List<CuerpoTecnico> findByEquipo(Long equipo_id);
 
+    List<CuerpoTecnico> findAllByEmailOrDocumento(String email, String documento);
+
     Optional<CuerpoTecnico> findById(Long id);
 
-    Optional<CuerpoTecnico> findByDocumento(String documento);
-
-    Optional<CuerpoTecnico> findByEmail(String email);
+    Optional<CuerpoTecnico> findByEmailOrDocumento(String email, String documento);
 
     void save(CuerpoTecnico cuerpoTecnico);
 

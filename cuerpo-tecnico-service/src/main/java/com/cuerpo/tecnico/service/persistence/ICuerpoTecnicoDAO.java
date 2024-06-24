@@ -14,11 +14,11 @@ public interface ICuerpoTecnicoDAO {
 
     List<CuerpoTecnico> findByEquipo(Long equipo_id);
 
+    List<CuerpoTecnico> findAllByEmailOrDocumento(String email, String documento);
+
+    Optional<CuerpoTecnico> findByEmailOrDocumento(String email, String documento);
+
     Optional<CuerpoTecnico> findById(Long id);
-
-    Optional<CuerpoTecnico> findByDocumento(String documento);
-
-    Optional<CuerpoTecnico> findByEmail(String email);
 
     void save(CuerpoTecnico cuerpoTecnico);
 

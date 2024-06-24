@@ -64,14 +64,9 @@ public class CuerpoTecnicoController {
     public ResponseEntity<ApiResponse> createStaff(@RequestBody @Valid CuerpoTecnicoDTO cTecnicoDTO){
 
         // Verificaciones antes de crear el registro
-        if (this.cuerpoTecnicoService.findByEmail(cTecnicoDTO.email()).isPresent()){
-            log.warn("Intento de registro de correo ya existente: {}", cTecnicoDTO.email());
-            throw new ResourceAlreadyExistsException("Staff", "email", cTecnicoDTO.email());
-        }
-
-        if (this.cuerpoTecnicoService.findByDocumento(cTecnicoDTO.documento()).isPresent()){
-            log.warn("Intento de registro de documento ya existente: {}", cTecnicoDTO.documento());
-            throw new ResourceAlreadyExistsException("Staff", "documento", cTecnicoDTO.documento());
+        if (this.cuerpoTecnicoService.findByEmailOrDocumento(cTecnicoDTO.email(), cTecnicoDTO.documento()).isPresent()){
+            log.warn("Intento de registro de correo/documento ya existente: {} {}", cTecnicoDTO.email(), cTecnicoDTO.documento());
+            throw new ResourceAlreadyExistsException("Staff", "email/documento", "");
         }
 
         // Creamos el nuevo integrante con la información proporcionada
@@ -114,14 +109,16 @@ public class CuerpoTecnicoController {
         }
 
         // Verificaciones antes de crear el registro
-        if (this.cuerpoTecnicoService.findByEmail(cTecnicoDTO.email()).isPresent() && !cTecnicoDTO.email().equals(cOptional.get().getEmail())){
-            log.warn("Intento de registro de correo ya existente: {}", cTecnicoDTO.email());
-            throw new ResourceAlreadyExistsException("Staff", "email", cTecnicoDTO.email());
+        List<CuerpoTecnico> lTecnicos = this.cuerpoTecnicoService.findAllByEmailOrDocumento(cTecnicoDTO.email(), cTecnicoDTO.documento());
+
+        if (lTecnicos.size() > 1){
+            log.warn("Intento de registro de correo/documento ya existente: {} {}", cTecnicoDTO.email(), cTecnicoDTO.documento());
+            throw new ResourceAlreadyExistsException("Staff", "email/documento", "");
         }
 
-        if (this.cuerpoTecnicoService.findByDocumento(cTecnicoDTO.documento()).isPresent() && !cTecnicoDTO.documento().equals(cOptional.get().getDocumento())){
-            log.warn("Intento de registro de documento ya existente: {}", cTecnicoDTO.documento());
-            throw new ResourceAlreadyExistsException("Staff", "documento", cTecnicoDTO.documento());
+        if (lTecnicos.size() == 1 && (!cTecnicoDTO.documento().equals(cOptional.get().getDocumento()) || !cTecnicoDTO.email().equals(cOptional.get().getEmail()))){
+            log.warn("Intento de registro de correo/documento ya existente: {} {}", cTecnicoDTO.email(), cTecnicoDTO.documento());
+            throw new ResourceAlreadyExistsException("Staff", "email/documento", "");
         }
 
         // En caso de intentar cambiar el equipo de un integrante activo 
@@ -161,7 +158,7 @@ public class CuerpoTecnicoController {
     public ResponseEntity<ApiResponse> linkStaff(@RequestBody @Valid VincularStaffDTO vDto){
 
         // Obtenemos el jugador
-        Optional<CuerpoTecnico> cOptional = this.cuerpoTecnicoService.findByEmail(vDto.email());
+        Optional<CuerpoTecnico> cOptional = this.cuerpoTecnicoService.findByEmailOrDocumento(vDto.email(), "");
 
         // Verificaciones de identidad
         if (cOptional.isEmpty()){

@@ -34,20 +34,20 @@ public class CuerpoTecnicoServiceImpl implements CuerpoTecnicoService {
     }
 
     @Override
+    public List<CuerpoTecnico> findAllByEmailOrDocumento(String email, String documento) {
+        return this.iCuerpoTecnicoDAO.findAllByEmailOrDocumento(email, documento);
+    }
+
+    @Override
+    public Optional<CuerpoTecnico> findByEmailOrDocumento(String email, String documento) {
+        return this.iCuerpoTecnicoDAO.findByEmailOrDocumento(email, documento);
+    }
+
+    @Override
     public Optional<CuerpoTecnico> findById(Long id) {
         return this.iCuerpoTecnicoDAO.findById(id);
     }
-
-    @Override
-    public Optional<CuerpoTecnico> findByDocumento(String documento) {
-        return this.iCuerpoTecnicoDAO.findByDocumento(documento);
-    }
-
-    @Override
-    public Optional<CuerpoTecnico> findByEmail(String email) {
-        return this.iCuerpoTecnicoDAO.findByEmail(email);
-    }
-
+    
     @Override
     public void save(CuerpoTecnico cuerpoTecnico) {
         this.iCuerpoTecnicoDAO.save(cuerpoTecnico);
