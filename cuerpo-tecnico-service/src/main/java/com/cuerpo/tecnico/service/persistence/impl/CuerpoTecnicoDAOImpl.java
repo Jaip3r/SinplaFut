@@ -24,8 +24,8 @@ public class CuerpoTecnicoDAOImpl implements ICuerpoTecnicoDAO {
     }
 
     @Override
-    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo) {
-        return this.cTecnicoRepository.findAllByTipo(tipo);
+    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo, Long equipoId) {
+        return this.cTecnicoRepository.findAllByTipoAndEquipoId(tipo, equipoId);
     }
 
     @Override

@@ -14,7 +14,7 @@ public interface CuerpoTecnicoRepository extends JpaRepository<CuerpoTecnico, Lo
 
     CuerpoTecnico findByEmail(String email);
 
-    List<CuerpoTecnico> findAllByTipo(CuerpoTecnicoType tipo);
+    List<CuerpoTecnico> findAllByTipoAndEquipoId(CuerpoTecnicoType tipo, Long equipoId);
 
     List<CuerpoTecnico> findAllByEquipoId(Long equipo_id);
     

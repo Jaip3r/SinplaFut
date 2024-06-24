@@ -24,8 +24,8 @@ public class CuerpoTecnicoServiceImpl implements CuerpoTecnicoService {
     }
 
     @Override
-    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo) {
-        return this.iCuerpoTecnicoDAO.findByTipo(tipo);
+    public List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo, Long equipoId) {
+        return this.iCuerpoTecnicoDAO.findByTipo(tipo, equipoId);
     }
 
     @Override

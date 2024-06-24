@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cuerpo.tecnico.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.cuerpo.tecnico.service.controllers.dtos.CuerpoTecnicoResponseDTO;
+import com.cuerpo.tecnico.service.controllers.dtos.VincularStaffDTO;
 import com.cuerpo.tecnico.service.controllers.payload.ApiResponse;
 import com.cuerpo.tecnico.service.exception.MemberActiveException;
 import com.cuerpo.tecnico.service.exception.ResourceAlreadyExistsException;
@@ -35,57 +36,6 @@ public class CuerpoTecnicoController {
 
     // Services
     private final CuerpoTecnicoService cuerpoTecnicoService;
-
-    @GetMapping("/findAll")
-    public ResponseEntity<ApiResponse> getStaff() {
-        
-        // Obtenemos la lista de todos los integrantes del cuerpo técnico actualmente activos
-        List<CuerpoTecnicoResponseDTO> staffList = this.cuerpoTecnicoService.findAll()
-                .stream().map(this::staffToResponseDTO).toList();
-
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(staffList)
-            .build()
-        );
-
-    }
-
-    @GetMapping("/findByTipo/{tipo}")
-    public ResponseEntity<ApiResponse> getStaffByTipo(@PathVariable("tipo") String tipo) {
-
-        // Verificación de no toparse con tipos no válidos
-        CuerpoTecnicoType tipoEnum;
-        try {
-            tipoEnum = CuerpoTecnicoType.valueOf(tipo.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                ApiResponse.builder()
-                    .flag(false)
-                    .code(400)
-                    .message("Tipo de staff técnico inválido")
-                    .data("no data provided")
-                    .build()
-            );
-        }
-        
-        // Obtenemos la lista de ciertos integrantes del cuerpo técnico de acuero a su tipo
-        List<CuerpoTecnicoResponseDTO> staffTipoList = this.cuerpoTecnicoService.findByTipo(tipoEnum)
-                .stream().map(this::staffToResponseDTO).toList();
-
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(staffTipoList)
-            .build()
-        );
-
-    }
 
     @GetMapping("/find/{id}")
     public ResponseEntity<ApiResponse> getStaffById(@PathVariable Long id) {
@@ -144,7 +94,7 @@ public class CuerpoTecnicoController {
             .builder()
             .flag(true)
             .code(200)
-            .message("Nuevo integrante registrado correctamente")
+            .message("Nuevo integrante del cuerpo técnico registrado correctamente")
             .data("No data provided")
             .build()
         );
@@ -174,6 +124,7 @@ public class CuerpoTecnicoController {
             throw new ResourceAlreadyExistsException("Staff", "documento", cTecnicoDTO.documento());
         }
 
+        // En caso de intentar cambiar el equipo de un integrante activo 
         if (cOptional.get().getEquipoId() != null && !cOptional.get().getEquipoId().equals(cTecnicoDTO.equipoId())){
             log.warn("Intento de cambio de equipo para un integrante actualmente en funciones: equipo {}, id {}", cOptional.get().getEquipoId(), cOptional.get().getId());
             throw new MemberActiveException(cOptional.get().getNombre(), cOptional.get().getApellido());
@@ -206,6 +157,50 @@ public class CuerpoTecnicoController {
 
     }
 
+    @PutMapping("/link")
+    public ResponseEntity<ApiResponse> linkStaff(@RequestBody @Valid VincularStaffDTO vDto){
+
+        // Obtenemos el jugador
+        Optional<CuerpoTecnico> cOptional = this.cuerpoTecnicoService.findByEmail(vDto.email());
+
+        // Verificaciones de identidad
+        if (cOptional.isEmpty()){
+            log.warn("Staff con correo {} no identificado", vDto.email());
+            throw new ResourceNotFoundException("Staff", "correo", vDto.email());
+        }
+
+        // Obtenemos los datos de la vinculación
+        CuerpoTecnico cuerpoTecnico = cOptional.get();
+
+        // En caso que se trate de una persona ya registrada en otro staff técnico
+        if (cuerpoTecnico.getEquipoId() != null){
+            return ResponseEntity.badRequest().body(
+                ApiResponse
+                .builder()
+                .flag(false)
+                .code(400)
+                .message("La persona especificada ya se encuentra vinculada a un staff técnico")
+                .data("No data providad")
+                .build()
+            );
+        }
+
+        // Registramos el cambio
+        cuerpoTecnico.setEquipoId(vDto.equipoId());
+        this.cuerpoTecnicoService.save(cuerpoTecnico);
+
+        log.info("Staff vinculado: {}", cuerpoTecnico);
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Nuevo integrante del cuerpo técnico vinculado correctamente")
+            .data("No data provided")
+            .build()
+        );
+
+    }
+
     @PutMapping("/unlink/{id}")
     public ResponseEntity<ApiResponse> unlinkStaff(@PathVariable Long id){
 
@@ -218,7 +213,7 @@ public class CuerpoTecnicoController {
             throw new ResourceNotFoundException("Staff", "identificador", id);
         }
 
-        // Finalizamos la vigencia del contrato del integrante
+        // Obtenemos los datos de la vinculación
         CuerpoTecnico cTecnico = staff.get();
         Long equipo = cTecnico.getEquipoId();
 
@@ -246,7 +241,7 @@ public class CuerpoTecnicoController {
             .builder()
             .flag(true)
             .code(200)
-            .message("Desvinculación del integrante realizada correctamente")
+            .message("Integrante del cuerpo técnico desvinculado correctamente")
             .data("No data provided")
             .build()
         );
@@ -263,17 +258,6 @@ public class CuerpoTecnicoController {
         if (staff.isEmpty()){
             log.warn("Staff con identificador {} no identificado", id);
             throw new ResourceNotFoundException("Staff", "identificador", id);
-        }
-
-        // No permitimos la eliminación de un integrante con vinculación vigente
-        if (staff.get().getEquipoId() != null){
-            log.info("Intento de eliminación de integrante con vinculación vigente con identificador {}", id);
-            return ResponseEntity.badRequest().body(ApiResponse.builder()
-                                .flag(false)
-                                .code(400)
-                                .message("El integrante aún se encuentra vinculado a un equipo")
-                                .data("No data provided")
-                                .build());
         }
 
         // Eliminamos al integrante del cuerpo técnico en cuestión
@@ -299,6 +283,20 @@ public class CuerpoTecnicoController {
         return ResponseEntity.ok(this.cuerpoTecnicoService.findByEquipo(equipoId)
                         .stream()
                         .map(this::staffToResponseDTO).toList());
+    }
+
+    @GetMapping("/findByEquipo/{equipoId}/tipo/{tipo}")
+    public ResponseEntity<?> getStaffByTipo(@PathVariable Long equipoId, @PathVariable String tipo) {
+
+        // Verificación de no toparse con tipos no válidos
+        CuerpoTecnicoType tipoEnum = CuerpoTecnicoType.valueOf(tipo.toUpperCase());
+        
+        // Obtenemos la lista de los integrantes del cuerpo técnico de acuerdo a aun tipo y equipo especifico
+        List<CuerpoTecnicoResponseDTO> staffTipoList = this.cuerpoTecnicoService.findByTipo(tipoEnum, equipoId)
+                .stream().map(this::staffToResponseDTO).toList();
+
+        return ResponseEntity.ok(staffTipoList);
+
     }
 
 

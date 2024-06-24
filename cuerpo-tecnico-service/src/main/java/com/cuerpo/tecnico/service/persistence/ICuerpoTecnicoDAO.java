@@ -10,7 +10,7 @@ public interface ICuerpoTecnicoDAO {
 
     List<CuerpoTecnico> findAll();
 
-    List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo);
+    List<CuerpoTecnico> findByTipo(CuerpoTecnicoType tipo, Long equipoId);
 
     List<CuerpoTecnico> findByEquipo(Long equipo_id);
 
