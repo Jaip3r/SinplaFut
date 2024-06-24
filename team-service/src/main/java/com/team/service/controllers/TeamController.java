@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
+import com.team.service.controllers.dtos.JugadorDTO;
 import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
 import com.team.service.controllers.dtos.TeamDTO;
 import com.team.service.controllers.dtos.TeamResponseDTO;
@@ -191,7 +192,7 @@ public class TeamController {
         }
 
         // Varificamos que el equipo no tenga jugadores o staff técnico asociados
-        if (this.teamService.findStaffByEquipoId(id).size() > 0){
+        if (this.teamService.findStaffByEquipoId(id).size() > 0 || this.teamService.findJugadorByEquipoId(id).size() > 0){
             log.warn("Intento de eliminación de club con jugadores y staff asociados: {}", equipo.getNombre());
             throw new AssociatedEntitiesException("Equipo", equipo.getNombre(), "staff-jugadores");
         }
@@ -217,7 +218,7 @@ public class TeamController {
 
     // Comunicación con otros MS
     
-    @GetMapping("findStaff/{equipoId}")
+    @GetMapping("/findStaff/{equipoId}")
     public ResponseEntity<ApiResponse> findStaff(@PathVariable Long equipoId){
 
         // Obtenemos el equipo
@@ -237,6 +238,71 @@ public class TeamController {
             .code(200)
             .message("Información de cuerpo técnico obtenida correctamente")
             .data(lTecnicoDTOs)
+            .build()
+        );
+
+    }
+
+    @GetMapping("/findJugador/{equipoId}")
+    public ResponseEntity<ApiResponse> findJugador(@PathVariable Long equipoId){
+
+        // Obtenemos el equipo
+        Team team = this.teamService.findById(equipoId);
+
+        if (team == null){
+            log.warn("Equipo con identificador {} no identificado", equipoId);
+            throw new ResourceNotFoundException("Equipo", "identificador", equipoId);
+        }
+
+        // Obtenemos la lista de los jugadores asociados al club
+        List<JugadorDTO> jList = this.teamService.findJugadorByEquipoId(equipoId);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Información de jugadores obtenida correctamente")
+            .data(jList)
+            .build()
+        );
+
+    }
+
+    @GetMapping("/findJugadorByEstado/{equipoId}/estado/{estado}")
+    public ResponseEntity<ApiResponse> findJugadorByEstado(@PathVariable Long equipoId, @PathVariable String estado){
+
+        // Obtenemos el equipo
+        Team team = this.teamService.findById(equipoId);
+
+        if (team == null){
+            log.warn("Equipo con identificador {} no identificado", equipoId);
+            throw new ResourceNotFoundException("Equipo", "identificador", equipoId);
+        }
+
+        // Validamos el estado - No deberia hacerse aqui
+        List<String> validEstados = List.of("LESIONADO", "ACTIVO", "INACTIVO", "RETIRADO");
+
+        if (!validEstados.contains(estado.toUpperCase())){
+            return ResponseEntity.badRequest().body(
+                ApiResponse
+                .builder()
+                .flag(false)
+                .code(400)
+                .message("Estado de jugador no válido")
+                .data("No data provided")
+                .build()
+            );
+        }
+
+        // Obtenemos los jugadores asociados al equipo por su estado
+        List<JugadorDTO> jugadorDTOs = this.teamService.findJugadorByEstado(equipoId, estado);
+
+        return ResponseEntity.ok(ApiResponse
+            .builder()
+            .flag(true)
+            .code(200)
+            .message("Información de jugadores obtenida correctamente")
+            .data(jugadorDTOs)
             .build()
         );
 

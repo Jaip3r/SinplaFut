@@ -3,6 +3,7 @@ package com.team.service.services;
 import java.util.List;
 
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
+import com.team.service.controllers.dtos.JugadorDTO;
 import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
 import com.team.service.models.Team;
 
@@ -23,6 +24,10 @@ public interface TeamService {
     // Peticiones a otros MS
 
     List<CuerpoTecnicoDTO> findStaffByEquipoId(Long equipoId);
+
+    List<JugadorDTO> findJugadorByEquipoId(Long equipoId);
+
+    List<JugadorDTO> findJugadorByEstado(Long equipoId, String estado);
 
     List<PlanEntrenamientoDTO> findSesionesByEquipoId(Long equipoId);
     

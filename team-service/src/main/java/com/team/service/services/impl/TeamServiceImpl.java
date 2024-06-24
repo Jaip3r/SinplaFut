@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.team.service.client.CuerpoTecnicoClient;
+import com.team.service.client.JugadorClient;
 import com.team.service.client.PlanEntrenamientoClient;
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
+import com.team.service.controllers.dtos.JugadorDTO;
 import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
 import com.team.service.models.Team;
 import com.team.service.persistence.ITeamDAO;
@@ -21,6 +23,7 @@ public class TeamServiceImpl implements TeamService {
     private final ITeamDAO teamDAO;
     private final CuerpoTecnicoClient cTecnicoClient;
     private final PlanEntrenamientoClient pEntrenamientoClient;
+    private final JugadorClient jugadorClient;
 
     @Override
     public List<Team> findAll() {
@@ -65,6 +68,18 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<PlanEntrenamientoDTO> findSesionesByEquipoId(Long equipoId) {
         return this.pEntrenamientoClient.findByEquipo(equipoId);
+    }
+
+    @Override
+    public List<JugadorDTO> findJugadorByEquipoId(Long equipoId) {
+        // Obtener los jugadores del equipo - consultando al microservicio respectivo
+        return this.jugadorClient.findByEquipo(equipoId);
+    }
+
+    @Override
+    public List<JugadorDTO> findJugadorByEstado(Long equipoId, String estado) {
+        // Obtener los jugadores del equipo por estado - consultando al microservicio respectivo
+        return this.jugadorClient.findByEstado(equipoId, estado);
     }
     
 }
