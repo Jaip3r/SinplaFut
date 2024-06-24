@@ -461,23 +461,10 @@ public class JugadorController {
     }
 
     @GetMapping("/findByEquipo/{equipoId}/estado/{estado}")
-    public ResponseEntity<ApiResponse> findByEstado(@PathVariable Long equipoId, @PathVariable String estado) { 
+    public ResponseEntity<?> findByEstado(@PathVariable Long equipoId, @PathVariable String estado) { 
 
         // Verificación de no toparse con estados no válidos
-        EstadoJugador eJugador;
-
-        try{
-            eJugador = EstadoJugador.valueOf(estado.toUpperCase());
-        } catch (IllegalArgumentException ex){
-            return ResponseEntity.badRequest().body(
-                ApiResponse.builder()
-                    .flag(false)
-                    .code(400)
-                    .message("Estado de jugador no válido")
-                    .data("no data provided")
-                    .build()
-            );
-        }
+        EstadoJugador eJugador = EstadoJugador.valueOf(estado.toUpperCase());
 
         // Obtenemos la lista de los jugadores de acuerdo a su estado
         List<JugadorResponseDTO> jList = this.jugadorService.findByEstado(eJugador)
@@ -487,14 +474,7 @@ public class JugadorController {
         List<JugadorResponseDTO> jListFiltrada = jList.stream()
                 .filter(jugador -> jugador.getId().equals(equipoId)).toList();
 
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(jListFiltrada)
-            .build()
-        );
+        return ResponseEntity.ok(jListFiltrada);
 
     }
 
