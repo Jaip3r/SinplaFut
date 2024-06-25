@@ -72,14 +72,9 @@ public class JugadorController {
     public ResponseEntity<ApiResponse> createJugador(@RequestBody @Valid JugadorDTO jDto) {
 
         // Verificaciones antes de crear el registro
-        if (this.jugadorService.findByEmail(jDto.email()).isPresent()){
-            log.warn("Intento de registro de correo ya existente: {}", jDto.email());
-            throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
-        }
-
-        if (this.jugadorService.findByDocumento(jDto.documento()).isPresent()){
-            log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
-            throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
+        if (this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta()).size() == 1){
+            log.warn("Intento de registro de correo/documento/camiseta ya existente: {} / {} / {}", jDto.email(), jDto.documento(), jDto.numero_camiseta());
+            throw new ResourceAlreadyExistsException("Jugador", "email/documento/camiseta", "");
         }
 
         // Creamos el nuevo jugador con la información proporcionada
@@ -128,14 +123,32 @@ public class JugadorController {
         }
 
         // Verificaciones antes de actualizar el registro
-        if (this.jugadorService.findByEmail(jDto.email()).isPresent() && !jDto.email().equals(jOptional.get().getEmail())){
+        List<Jugador> lJugadors = this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta());
+
+        if (lJugadors.size() > 1){
+            return ResponseEntity.badRequest().body(
+                ApiResponse
+                .builder()
+                .flag(false)
+                .code(400)
+                .message("Favor verificar que el correo, el documento o la camiseta no se encuentren ya registrados")
+                .data("No data providad")
+                .build()
+            );
+        }
+
+        if (lJugadors.size() == 1 && !jDto.email().equals(jOptional.get().getEmail())){
             log.warn("Intento de registro de correo ya existente: {}", jDto.email());
             throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
         }
 
-        if (this.jugadorService.findByDocumento(jDto.documento()).isPresent() && !jDto.documento().equals(jOptional.get().getDocumento())){
+        if (lJugadors.size() == 1 && !jDto.documento().equals(jOptional.get().getDocumento())){
             log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
             throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
+        }
+
+        if (lJugadors.size() == 1 && jDto.numero_camiseta() != jOptional.get().getNumero_camiseta()){
+            throw new ResourceAlreadyExistsException("Jugador", "numero_camiseta", jDto.numero_camiseta());
         }
 
         Jugador jugador = jOptional.get();
@@ -170,6 +183,7 @@ public class JugadorController {
         // En caso que el jugador cambie a estado retirado lo desvinculamos del equipo
         if (jDto.estado().equals("retirado")){
             jugador.setEquipoId(null);
+            jugador.setEstado(EstadoJugador.RETIRADO);
             log.warn("El jugador {} {} se ha retirado de las canchas", jugador.getNombre(), jugador.getApellido());
             return ResponseEntity.ok(ApiResponse
                 .builder()
@@ -200,16 +214,16 @@ public class JugadorController {
     public ResponseEntity<ApiResponse> linkJugador(@RequestBody @Valid VincularJugadorDTO vDto){
 
         // Obtenemos el jugador
-        Optional<Jugador> jOptional = this.jugadorService.findByEmail(vDto.email());
+        List<Jugador> jList = this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(vDto.email(), "", 0);
 
         // Verificaciones de identidad
-        if (jOptional.isEmpty()){
+        if (jList.size() == 0){
             log.warn("Jugador con correo {} no identificado", vDto.email());
             throw new ResourceNotFoundException("Jugador", "correo", vDto.email());
         }
 
         // Verificamos que el jugador a ingresar no se encuentre retirado o 
-        Jugador jugador = jOptional.get();
+        Jugador jugador = jList.get(0);
 
         if (jugador.getEstado().toString().equals("RETIRADO")){
             log.warn("El jugador {} {} se ha retirado de las canchas y no puede ser vinculado a un equipo", jugador.getNombre(), jugador.getApellido());
@@ -235,6 +249,19 @@ public class JugadorController {
             );
         }
 
+        // En caso de tratar de vincular a un jugador con vinculación vigente a otro equipo
+        if (jugador.getEquipoId() != null){
+            return ResponseEntity.badRequest().body(
+                ApiResponse
+                .builder()
+                .flag(false)
+                .code(400)
+                .message("El jugador especificado ya se encuentra vinculado a un equipo")
+                .data("No data providad")
+                .build()
+            );
+        }
+
         // Registramos los cambios
         jugador.setEquipoId(vDto.equipoId());
         jugador.setEstado(EstadoJugador.ACTIVO);
@@ -245,7 +272,7 @@ public class JugadorController {
             .builder()
             .flag(true)
             .code(200)
-            .message("Jugador vinculado correctamente")
+            .message("Nuevo jugador vinculado correctamente")
             .data("No data provided")
             .build()
         );
@@ -306,7 +333,7 @@ public class JugadorController {
             .builder()
             .flag(true)
             .code(200)
-            .message("Desvinculación del jugador realizada correctamente")
+            .message("Jugador desvinculado correctamente")
             .data("No data provided")
             .build()
         );
@@ -323,17 +350,6 @@ public class JugadorController {
         if (jOptional.isEmpty()){
             log.warn("Jugador con identificador {} no identificado", jugadorId);
             throw new ResourceNotFoundException("Jugador", "identificador", jugadorId);
-        }
-
-        // No permitimos la eliminación de un jugador con vinculación vigente
-        if (jOptional.get().getEquipoId() != null){
-            log.info("Intento de eliminación del jugador con identificador {} con vinculación vigente", jugadorId);
-            return ResponseEntity.badRequest().body(ApiResponse.builder()
-                                .flag(false)
-                                .code(400)
-                                .message("El jugador especificado aún se encuentra vinculado a un equipo")
-                                .data("No data provided")
-                                .build());
         }
 
         // Eliminamos al jugador en cuestión

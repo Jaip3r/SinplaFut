@@ -14,14 +14,12 @@ public interface JugadorService {
 
     List<Jugador> findByEstado(EstadoJugador estado, Long equipoId);
 
-    Optional<Jugador> findByDocumento(String documento);
+    List<Jugador> findAllByEmailOrDocumentoOrCamiseta(String email, String documento, int numero_camiseta);
 
     Optional<Jugador> findById(Long id);
-
-    Optional<Jugador> findByEmail(String email);
 
     void save(Jugador jugador);
 
     void deleteById(Long id);
-    
+
 }
