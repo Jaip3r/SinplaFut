@@ -35,6 +35,10 @@ public class GatewayConfig {
                     .path("/plan-entrenamiento-service/*")
                     .uri("http://localhost:8084")
                 )
+                .route(route -> route
+                    .path("/sesion-entrenamiento-service/*")
+                    .uri("http://localhost:8085")
+                )
                 .build();
 
     }
@@ -64,6 +68,10 @@ public class GatewayConfig {
                 .route(route -> route
                     .path("/plan-entrenamiento-service/**")
                     .uri("lb://plan-entrenamiento-service")
+                )
+                .route(route -> route
+                    .path("/sesion-entrenamiento-service/**")
+                    .uri("lb://sesion-entrenamiento-service")
                 )
                 .build();
 
