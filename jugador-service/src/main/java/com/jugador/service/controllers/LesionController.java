@@ -41,14 +41,7 @@ public class LesionController {
         List<LesionResponseDTO> lesionList = this.lService.findAll()
                 .stream().map(this::lesionToResponseDTO).toList();
 
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(lesionList)
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Info obtenida correctamente", lesionList));
 
     }
 
@@ -64,14 +57,7 @@ public class LesionController {
             throw new ResourceNotFoundException("Lesión", "identificador", id);
         }
 
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(this.lesionToResponseDTO(optional.get()))
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Info obtenida correctamente", this.lesionToResponseDTO(optional.get())));
 
     }
 
@@ -95,14 +81,7 @@ public class LesionController {
         this.lService.save(lesion);
 
         log.info("POST: Lesion {}", lesion);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Nueva lesión registrada correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Nueva lesión registrada correctamente", "No data provided"));
 
     }
 
@@ -183,6 +162,18 @@ public class LesionController {
                 .observaciones(lesion.getObservaciones())
                 .build();
 
+    }
+
+
+    // Aux methods
+
+    private ApiResponse createApiResponse(boolean flag, int code, String message, Object data){
+        return ApiResponse.builder()
+                .flag(flag)
+                .code(code)
+                .message(message)
+                .data(data)
+                .build();
     }
     
 }

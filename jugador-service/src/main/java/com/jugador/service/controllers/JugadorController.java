@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jugador.service.controllers.dtos.JugadorDTO;
 import com.jugador.service.controllers.dtos.JugadorLesionDTO;
+import com.jugador.service.controllers.dtos.JugadorLesionResponseDTO;
 import com.jugador.service.controllers.dtos.JugadorResponseDTO;
-import com.jugador.service.controllers.dtos.LesionResponseDTO;
 import com.jugador.service.controllers.dtos.VincularJugadorDTO;
 import com.jugador.service.controllers.payload.ApiResponse;
 import com.jugador.service.exception.ResourceAlreadyExistsException;
@@ -57,14 +57,7 @@ public class JugadorController {
             throw new ResourceNotFoundException("Jugador", "identificador", jugadorId);
         }
 
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Info obtenida correctamente")
-            .data(this.jugadorToResponseDTO(jOptional.get()))
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Info obtenida correctamente", this.jugadorToResponseDTO(jOptional.get())));
 
     }
 
@@ -99,14 +92,7 @@ public class JugadorController {
         this.jugadorService.save(jugador);
 
         log.info("POST: Jugador {}", jDto);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Nuevo jugador registrado correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Nuevo jugador registrado correctamente", "No data provided"));
 
     }
 
@@ -124,45 +110,32 @@ public class JugadorController {
 
         // Verificaciones antes de actualizar el registro
         List<Jugador> lJugadors = this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta());
-
-        if (lJugadors.size() > 1){
-            return ResponseEntity.badRequest().body(
-                ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("Favor verificar que el correo, el documento o la camiseta no se encuentren ya registrados")
-                .data("No data providad")
-                .build()
-            );
-        }
-
-        if (lJugadors.size() == 1 && !jDto.email().equals(jOptional.get().getEmail())){
-            log.warn("Intento de registro de correo ya existente: {}", jDto.email());
-            throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
-        }
-
-        if (lJugadors.size() == 1 && !jDto.documento().equals(jOptional.get().getDocumento())){
-            log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
-            throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
-        }
-
-        if (lJugadors.size() == 1 && jDto.numero_camiseta() != jOptional.get().getNumero_camiseta()){
-            throw new ResourceAlreadyExistsException("Jugador", "numero_camiseta", jDto.numero_camiseta());
-        }
-
         Jugador jugador = jOptional.get();
 
-        // En caso de cambiar el estado
+        if (lJugadors.size() > 1){
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Favor verificar que el correo, el documento o la camiseta no se encuentren ya registrados", "No data provided"));
+        }
+
+        if (lJugadors.size() == 1) {
+        
+            if (!jDto.email().equals(jugador.getEmail())) {
+                log.warn("Intento de registro de correo ya existente: {}", jDto.email());
+                throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
+            }
+        
+            if (!jDto.documento().equals(jugador.getDocumento())) {
+                log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
+                throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
+            }
+        
+            if (jDto.numero_camiseta() != jugador.getNumero_camiseta()) {
+                throw new ResourceAlreadyExistsException("Jugador", "numero_camiseta", jDto.numero_camiseta());
+            }
+        }
+
+        // En caso de intentar cambiar el estado lesionado a activo y posee lesiones activas
         if (jugador.getEstado().toString().equals("LESIONADO") && jDto.estado().equals("activo") && this.hasActiveLesiones(jugador)){
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("No es posible activar nuevamente al jugador, aún mantiene lesiones activas")
-                .data("No data provided")
-                .build()
-            );
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "No es posible activar nuevamente al jugador, aún mantiene lesiones activas", "No data provided"));
         }
 
         // Actualizamos la data del jugador
@@ -182,31 +155,19 @@ public class JugadorController {
 
         // En caso que el jugador cambie a estado retirado lo desvinculamos del equipo
         if (jDto.estado().equals("retirado")){
+
             jugador.setEquipoId(null);
             jugador.setEstado(EstadoJugador.RETIRADO);
+
             log.warn("El jugador {} {} se ha retirado de las canchas", jugador.getNombre(), jugador.getApellido());
-            return ResponseEntity.ok(ApiResponse
-                .builder()
-                .flag(true)
-                .code(200)
-                .message("Estado de jugador actualizado: Retirado de las canchas")
-                .data("No data provided")
-                .build()
-            );
+
         }
 
         // Registramos los cambios
         this.jugadorService.save(jugador);
 
         log.info("PUT: Jugador {}", jugador);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Jugador actualizado correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Jugador actualizado correctamente", "No data provided"));
 
     }
 
@@ -222,44 +183,17 @@ public class JugadorController {
             throw new ResourceNotFoundException("Jugador", "correo", vDto.email());
         }
 
-        // Verificamos que el jugador a ingresar no se encuentre retirado o 
+        // Verificamos que el jugador a ingresar no se encuentre retirado 
         Jugador jugador = jList.get(0);
 
         if (jugador.getEstado().toString().equals("RETIRADO")){
             log.warn("El jugador {} {} se ha retirado de las canchas y no puede ser vinculado a un equipo", jugador.getNombre(), jugador.getApellido());
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("El jugador especificado se encuentra retirado")
-                .data("No data provided")
-                .build()
-            );
-        }
-
-        if (jugador.getEstado().toString().equals("LESIONADO")){
-            log.warn("El jugador {} {} se encuentra lesionado y no puede ser vinculado a un equipo", jugador.getNombre(), jugador.getApellido());
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("El jugador especificado se encuentra lesionado")
-                .data("No data provided")
-                .build()
-            );
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador especificado se encuentra retirado", "No data provided"));
         }
 
         // En caso de tratar de vincular a un jugador con vinculación vigente a otro equipo
         if (jugador.getEquipoId() != null){
-            return ResponseEntity.badRequest().body(
-                ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("El jugador especificado ya se encuentra vinculado a un equipo")
-                .data("No data providad")
-                .build()
-            );
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador especificado ya se encuentra vinculado a un equipo", "No data provided"));
         }
 
         // Registramos los cambios
@@ -268,14 +202,7 @@ public class JugadorController {
         this.jugadorService.save(jugador);
 
         log.info("Jugador vinculado: {}", jugador);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Nuevo jugador vinculado correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Nuevo jugador vinculado correctamente", "No data provided"));
 
     }
 
@@ -298,27 +225,13 @@ public class JugadorController {
         // En caso de intentar finalizar la vigencia de un integrante ya desvinculado
         if (jugador.getEquipoId() == null) {
             log.info("Intento de finalizar la vigencia de un jugador sin ninguna afiliacion registada: {} {}", jugador.getNombre(), jugador.getApellido());
-            return ResponseEntity.badRequest().body(ApiResponse
-                                .builder()
-                                .flag(false)
-                                .code(400)
-                                .message("El jugador especificado esta retirado o no se encuentra vinculado a ningún equipo")
-                                .data("No data provided")
-                                .build()
-                            );
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador especificado esta retirado o no se encuentra vinculado a ningún equipo", "No data provided"));
         }
 
         // En caso de intentar desvincular a un jugador lesionado
-        if (this.hasActiveLesiones(jugador)){
+        if (hasActiveLesiones(jugador)){
             log.warn("Intento de desvincular a un jugador que esta actualmente lesionado: {} {}", jugador.getNombre(), jugador.getApellido());
-            return ResponseEntity.badRequest().body(ApiResponse
-                                .builder()
-                                .flag(false)
-                                .code(400)
-                                .message("El jugador especificado no puede ser desvinculado: Se encuentra actualmente lesionado")
-                                .data("No data provided")
-                                .build()
-                            );
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador especificado se encuentra actualmente lesionado y no puede ser desvinculado", "No data provided"));
         }
 
         // Desvinculamos al integrante en especifico y cambiamos su estado
@@ -329,14 +242,7 @@ public class JugadorController {
         this.jugadorService.save(jugador);
 
         log.info("Desvinculación del jugador con identificador {}, del equipo {}", jugadorId, equipo);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Jugador desvinculado correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Jugador desvinculado correctamente", "No data provided"));
 
     }
 
@@ -356,19 +262,12 @@ public class JugadorController {
         this.jugadorService.deleteById(jugadorId);
 
         log.info("DELETE: Jugador con identificador {}", jugadorId);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Jugador eliminado correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Jugador eliminado correctamente", "No data provided"));
 
     }
 
 
-    // Endpoints para la asignación de lesiones a jugadores
+    // Endpoints para el control de  las lesiones de jugadores
 
     @GetMapping("/getLesiones/{jugadorId}")
     public ResponseEntity<ApiResponse> getLesionesJugador(@PathVariable Long jugadorId){
@@ -383,60 +282,53 @@ public class JugadorController {
         }
 
         // Obtenemos las lesiones
-        List<LesionResponseDTO> lesiones = jOptional.get().getLesiones()
-                .stream().map(data -> this.lesionToResponseDTO(data.getLesion())).toList();
+        List<JugadorLesionResponseDTO> lesiones = jOptional.get().getLesiones()
+                .stream().map(this::jugadorLesionToResponseDTO).toList();
 
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Lesiones obtenidas correctamente")
-            .data(lesiones)
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesiones obtenidas correctamente", lesiones));
+
+    }
+
+    @GetMapping("/getLesion/{id}")
+    public ResponseEntity<ApiResponse> getLesion(@PathVariable Long id){
+
+        // Obtenemos el registro
+        Optional<JugadorLesion> jOptional = this.jugadorLesionService.findById(id);
+
+        // Verificación de integridad
+        if (jOptional.isEmpty()){
+            log.warn("Registro de lesion asignada ajugador con identificador {} no identificada", id);
+            throw new ResourceNotFoundException("Lesión", "identificador", id);
+        }
+
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesiones obtenidas correctamente", jugadorLesionToResponseDTO(jOptional.get())));
 
     }
 
     @PostMapping("/assignLesion/{jugadorId}")
     public ResponseEntity<ApiResponse> asignarLesion(@RequestBody @Valid JugadorLesionDTO jLesionDTO, @PathVariable Long jugadorId){
 
+        LocalDate fechaInicio = jLesionDTO.fecha_inicio();
+        LocalDate fechaFin = jLesionDTO.fecha_fin();
+        LocalDate now = LocalDate.now();
+
         // Verificaciones antes de crear el registro
-        if (jLesionDTO.fecha_inicio().isEqual(jLesionDTO.fecha_fin())){
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("Las fechas de inicio y recuperación de la lesión no pueden coincidir")
-                .data("No data provided")
-                .build()
-            );
+        if (fechaInicio.isEqual(fechaFin)) {
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Las fechas de inicio y recuperación de la lesión no pueden coincidir", "No data provided"));
         }
 
-        if (jLesionDTO.fecha_inicio().isAfter(LocalDate.now()) || jLesionDTO.fecha_fin().isBefore(LocalDate.now())){
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("Las fechas de inicio y recuperación de la lesión no son válidas")
-                .data("No data provided")
-                .build()
-            );
-        }
-
-        if (jLesionDTO.fecha_inicio().isAfter(jLesionDTO.fecha_fin())){
-            return ResponseEntity.badRequest().body(ApiResponse
-                .builder()
-                .flag(false)
-                .code(400)
-                .message("Las fecha de inicio no puede proceder a la fecha de recuperación de la lesión")
-                .data("No data provided")
-                .build()
-            );
+        if (fechaInicio.isAfter(now) || fechaFin.isBefore(now) || fechaInicio.isAfter(fechaFin)) {
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Las fechas de inicio y recuperación de la lesión no son válidas", "No data provided"));
         }
 
         // Obtemos al jugador y la lesión pertinentes
         Optional<Jugador> jOptional = this.jugadorService.findById(jugadorId);
         Optional<Lesion> lOptional = this.lesionService.findById(jLesionDTO.lesionId());
+
+        // Verificamos que el registro de esa lesión no sea repetido
+        if (this.jugadorLesionService.findJugadorLesion(jOptional.get(), lOptional.get(), fechaInicio, fechaFin).isPresent()){
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador ya posee este registro de lesión", "No data provided"));
+        }
 
         // Creamos el registro con los datos obtenidos
         JugadorLesion jLesion = JugadorLesion
@@ -455,14 +347,75 @@ public class JugadorController {
         this.jugadorService.save(jugador);
 
         log.info("Asignando lesión al Jugador con identificador {}", jugadorId);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Lesión asignada correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesión asignada correctamente", "No data provided"));
+
+    }
+
+    @PutMapping("/updateLesion/{id}")
+    public ResponseEntity<ApiResponse> actualizarLesion(@RequestBody @Valid JugadorLesionDTO jLesionDTO, @PathVariable Long id){
+
+        // Obtenemos el registro
+        Optional<JugadorLesion> jOptional = this.jugadorLesionService.findById(id);
+
+        // Verificación de integridad
+        if (jOptional.isEmpty()){
+            log.warn("Registro de lesion asignada ajugador con identificador {} no identificada", id);
+            throw new ResourceNotFoundException("Lesión", "identificador", id);
+        }
+
+        // Verificaciones de datos
+        LocalDate fechaInicio = jLesionDTO.fecha_inicio();
+        LocalDate fechaFin = jLesionDTO.fecha_fin();
+        LocalDate now = LocalDate.now();
+
+        if (fechaInicio.isEqual(fechaFin)) {
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Las fechas de inicio y recuperación de la lesión no pueden coincidir", "No data provided"));
+        }
+
+        if (fechaInicio.isAfter(now) || fechaInicio.isAfter(fechaFin)) {
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Las fechas de inicio y recuperación de la lesión no son válidas", "No data provided"));
+        }
+
+        // Obtemos la lesión pertinente
+        Optional<Lesion> lOptional = this.lesionService.findById(jLesionDTO.lesionId());
+
+        // Verificamos que el registro de esa lesión no sea repetido    
+        Optional<JugadorLesion> jLesionOptional = this.jugadorLesionService.findJugadorLesion(jOptional.get().getJugador(), lOptional.get(), fechaInicio, fechaFin);
+
+        if (jLesionOptional.isPresent() && !jLesionOptional.get().getId().equals(id)){
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador ya posee este registro de lesión", "No data provided"));
+        }
+
+        // Actualizamos los campos y registramos los cambios
+        JugadorLesion jLesion = jOptional.get();
+
+        jLesion.setLesion(lOptional.get());
+        jLesion.setFecha_inicio(fechaInicio);
+        jLesion.setFecha_fin(fechaFin);
+        
+        this.jugadorLesionService.save(jLesion);
+
+        log.info("lesión {} del Jugador {} actualizada correctamente", jLesion.getId(), jLesion.getJugador().getId());
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesión de jugador actualizada correctamente", "No data provided"));
+
+    }
+
+    @DeleteMapping("/deleteLesion/{id}")
+    public ResponseEntity<ApiResponse> deleteLesionAsignada(@PathVariable Long id){
+
+        // Obtenemos el registro
+        Optional<JugadorLesion> jOptional = this.jugadorLesionService.findById(id);
+
+        // Verificación de integridad
+        if (jOptional.isEmpty()){
+            log.warn("Registro de lesion asignada ajugador con identificador {} no identificada", id);
+            throw new ResourceNotFoundException("Lesión", "identificador", id);
+        }
+
+        // Eliminamos el registro en cuestión
+        this.jugadorLesionService.deleteById(id);
+
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesión desasignada correctamente", "No data provided"));
 
     }
 
@@ -515,13 +468,13 @@ public class JugadorController {
 
     }
 
-    private LesionResponseDTO lesionToResponseDTO(Lesion lesion) {
+    private JugadorLesionResponseDTO jugadorLesionToResponseDTO(JugadorLesion jLesion) {
 
-        return LesionResponseDTO.builder()
-                .id(lesion.getId())
-                .nombre(lesion.getNombre())
-                .tratamiento(lesion.getTratamiento())
-                .observaciones(lesion.getObservaciones())
+        return JugadorLesionResponseDTO.builder()
+                .id(jLesion.getId())
+                .lesion(jLesion.getLesion().getNombre())
+                .fecha_inicio(jLesion.getFecha_inicio().toString())
+                .fecha_fin(jLesion.getFecha_fin().toString())
                 .build();
 
     }
@@ -541,6 +494,15 @@ public class JugadorController {
         return jLesions.stream()
                     .anyMatch(lesion -> lesion.getFecha_fin().isAfter(fechaActual));
 
+    }
+
+    private ApiResponse createApiResponse(boolean flag, int code, String message, Object data){
+        return ApiResponse.builder()
+                .flag(flag)
+                .code(code)
+                .message(message)
+                .data(data)
+                .build();
     }
     
 }
