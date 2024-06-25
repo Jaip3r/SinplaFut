@@ -67,7 +67,7 @@ public class JugadorController {
         // Verificaciones antes de crear el registro
         if (this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta()).size() == 1){
             log.warn("Intento de registro de correo/documento/camiseta ya existente: {} / {} / {}", jDto.email(), jDto.documento(), jDto.numero_camiseta());
-            throw new ResourceAlreadyExistsException("Jugador", "email/documento/camiseta", "");
+            throw new ResourceAlreadyExistsException("Jugador", "email o documento o camiseta", "");
         }
 
         // Creamos el nuevo jugador con la información proporcionada
@@ -229,7 +229,7 @@ public class JugadorController {
         }
 
         // En caso de intentar desvincular a un jugador lesionado
-        if (hasActiveLesiones(jugador)){
+        if (hasActiveLesiones(jugador) || jugador.getEstado().toString().equals("LESIONADO")){
             log.warn("Intento de desvincular a un jugador que esta actualmente lesionado: {} {}", jugador.getNombre(), jugador.getApellido());
             return ResponseEntity.badRequest().body(createApiResponse(false, 400, "El jugador especificado se encuentra actualmente lesionado y no puede ser desvinculado", "No data provided"));
         }

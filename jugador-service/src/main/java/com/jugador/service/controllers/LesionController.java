@@ -1,5 +1,6 @@
 package com.jugador.service.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import com.jugador.service.controllers.dtos.LesionResponseDTO;
 import com.jugador.service.controllers.payload.ApiResponse;
 import com.jugador.service.exception.ResourceAlreadyExistsException;
 import com.jugador.service.exception.ResourceNotFoundException;
+import com.jugador.service.models.JugadorLesion;
 import com.jugador.service.models.Lesion;
 import com.jugador.service.services.LesionService;
 
@@ -113,14 +115,7 @@ public class LesionController {
         this.lService.save(lesion);
 
         log.info("PUT: Lesion {}", lesion);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Lesión actualizada correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesión actualizada correctamente", "No data provided"));
 
     }
 
@@ -136,18 +131,17 @@ public class LesionController {
             throw new ResourceNotFoundException("Lesión", "identificador", id);
         }
 
+        // En caso de eliminar una lesión asociada a registros activos
+        if (hasActiveLesionRecords(optional.get())){
+            log.warn("Intento de eliminar una lesión con asociaciones activas: Identificador {}", id);
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "La lesión especificada se encuentra activa para varios jugadores", "No data provided"));
+        }
+
         // Eliminamos la lesión en cuestión
         this.lService.deleteById(id);
 
         log.info("DELETE: Lesión con identificador {}", id);
-        return ResponseEntity.ok(ApiResponse
-            .builder()
-            .flag(true)
-            .code(200)
-            .message("Lesión eliminada correctamente")
-            .data("No data provided")
-            .build()
-        );
+        return ResponseEntity.ok(createApiResponse(true, 200, "Lesión eliminada correctamente", "No data provided"));
 
     }
 
@@ -166,6 +160,20 @@ public class LesionController {
 
 
     // Aux methods
+
+    private boolean hasActiveLesionRecords(Lesion lesion) {
+
+        // Obtenemos todo los registros de lesiones que tengan asociado a esta lesión en especifico
+        List<JugadorLesion> lesions = lesion.getJugadores();
+
+        // Registramos la fecha actual
+        LocalDate fechaActual = LocalDate.now();
+
+        // Verificamos si posee registros de lesiones activas
+        return lesions.stream()
+                    .anyMatch(l -> l.getFecha_fin().isAfter(fechaActual));
+
+    }
 
     private ApiResponse createApiResponse(boolean flag, int code, String message, Object data){
         return ApiResponse.builder()
