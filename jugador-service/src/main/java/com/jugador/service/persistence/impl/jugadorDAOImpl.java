@@ -34,8 +34,13 @@ public class jugadorDAOImpl implements IJugadorDAO {
     }
 
     @Override
-    public List<Jugador> findAllByEmailOrDocumentoOrCamiseta(String email, String documento, int numero_camiseta) {
-        return this.jugadorRepository.findAllByEmailOrDocumentoOrCamiseta(email, documento, numero_camiseta);
+    public List<Jugador> findAllByEmailOrDocumento(String email, String documento) {
+        return this.jugadorRepository.findAllByEmailOrDocumento(email, documento);
+    }
+
+    @Override
+    public Optional<Jugador> findByEquipoAndCamiseta(Long equipoId, int numero_camiseta) {
+        return this.jugadorRepository.findByEquipoIdAndCamiseta(equipoId, numero_camiseta);
     }
 
     @Override

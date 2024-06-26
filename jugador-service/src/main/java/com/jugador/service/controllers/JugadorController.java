@@ -65,9 +65,14 @@ public class JugadorController {
     public ResponseEntity<ApiResponse> createJugador(@RequestBody @Valid JugadorDTO jDto) {
 
         // Verificaciones antes de crear el registro
-        if (this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta()).size() == 1){
-            log.warn("Intento de registro de correo/documento/camiseta ya existente: {} / {} / {}", jDto.email(), jDto.documento(), jDto.numero_camiseta());
-            throw new ResourceAlreadyExistsException("Jugador", "email o documento o camiseta", "");
+        if (this.jugadorService.findAllByEmailOrDocumento(jDto.email(), jDto.documento()).size() == 1){
+            log.warn("Intento de registro de correo/documento ya existente: {} / {}", jDto.email(), jDto.documento());
+            throw new ResourceAlreadyExistsException("Jugador", "email o documento", "");
+        }
+
+        if (this.jugadorService.findByEquipoAndCamiseta(jDto.equipoId(), jDto.numero_camiseta()).isPresent()){
+            log.warn("Intento de registro de camiseta ya asignada dentro del equipo: {}", jDto.numero_camiseta());
+            throw new ResourceAlreadyExistsException("Jugador", "número de camiseta", jDto.numero_camiseta());
         }
 
         // Creamos el nuevo jugador con la información proporcionada
@@ -109,28 +114,20 @@ public class JugadorController {
         }
 
         // Verificaciones antes de actualizar el registro
-        List<Jugador> lJugadors = this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(jDto.email(), jDto.documento(), jDto.numero_camiseta());
+        List<Jugador> lJugadors = this.jugadorService.findAllByEmailOrDocumento(jDto.email(), jDto.documento());
         Jugador jugador = jOptional.get();
 
         if (lJugadors.size() > 1){
-            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Favor verificar que el correo, el documento o la camiseta no se encuentren ya registrados", "No data provided"));
+            return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Favor verificar que el correo, el documento o no se encuentren ya registrados", "No data provided"));
         }
 
-        if (lJugadors.size() == 1 && !lJugadors.get(0).getId().equals(jugador.getId())) {
-        
-            if (lJugadors.get(0).getEmail().equals(jugador.getEmail())) {
-                log.warn("Intento de registro de correo ya existente: {}", jDto.email());
-                throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
-            }
-        
-            if (lJugadors.get(0).getDocumento().equals(jugador.getDocumento())) {
-                log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
-                throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
-            }
-        
-            if (lJugadors.get(0).getNumero_camiseta() == jugador.getNumero_camiseta() && lJugadors.get(0).getEquipoId().equals(jugador.getEquipoId())) {
-                throw new ResourceAlreadyExistsException("Jugador", "numero_camiseta", jDto.numero_camiseta());
-            }
+        if (lJugadors.size() == 1 && (!jDto.documento().equals(jOptional.get().getDocumento()) || !jDto.email().equals(jOptional.get().getEmail()))){
+            log.warn("Intento de registro de correo o documento ya existente: {} {}", jDto.email(), jDto.documento());
+            throw new ResourceAlreadyExistsException("Jugador", "email o documento", "");
+        }
+
+        if (this.jugadorService.findByEquipoAndCamiseta(jDto.equipoId(), jDto.numero_camiseta()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Jugador", "número de camiseta", jDto.numero_camiseta());
         }
 
         // En caso de intentar cambiar el estado lesionado a activo y posee lesiones activas
@@ -175,7 +172,7 @@ public class JugadorController {
     public ResponseEntity<ApiResponse> linkJugador(@RequestBody @Valid VincularJugadorDTO vDto){
 
         // Obtenemos el jugador
-        List<Jugador> jList = this.jugadorService.findAllByEmailOrDocumentoOrCamiseta(vDto.email(), "", 0);
+        List<Jugador> jList = this.jugadorService.findAllByEmailOrDocumento(vDto.email(), "");
 
         // Verificaciones de identidad
         if (jList.size() == 0){

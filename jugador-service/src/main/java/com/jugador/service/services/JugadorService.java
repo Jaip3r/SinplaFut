@@ -14,7 +14,9 @@ public interface JugadorService {
 
     List<Jugador> findByEstado(EstadoJugador estado, Long equipoId);
 
-    List<Jugador> findAllByEmailOrDocumentoOrCamiseta(String email, String documento, int numero_camiseta);
+    List<Jugador> findAllByEmailOrDocumento(String email, String documento);
+
+    Optional<Jugador> findByEquipoAndCamiseta(Long equipoId, int numero_camiseta);
 
     Optional<Jugador> findById(Long id);
 

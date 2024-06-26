@@ -34,8 +34,13 @@ public class JugadorServiceImpl implements JugadorService {
     }
 
     @Override
-    public List<Jugador> findAllByEmailOrDocumentoOrCamiseta(String email, String documento, int numero_camiseta) {
-        return this.iJugadorDAO.findAllByEmailOrDocumentoOrCamiseta(email, documento, numero_camiseta);
+    public List<Jugador> findAllByEmailOrDocumento(String email, String documento) {
+        return this.iJugadorDAO.findAllByEmailOrDocumento(email, documento);
+    }
+
+    @Override
+    public Optional<Jugador> findByEquipoAndCamiseta(Long equipoId, int numero_camiseta) {
+        return this.iJugadorDAO.findByEquipoAndCamiseta(equipoId, numero_camiseta);
     }
 
     @Override
