@@ -116,19 +116,19 @@ public class JugadorController {
             return ResponseEntity.badRequest().body(createApiResponse(false, 400, "Favor verificar que el correo, el documento o la camiseta no se encuentren ya registrados", "No data provided"));
         }
 
-        if (lJugadors.size() == 1) {
+        if (lJugadors.size() == 1 && !lJugadors.get(0).getId().equals(jugador.getId())) {
         
-            if (!jDto.email().equals(jugador.getEmail())) {
+            if (lJugadors.get(0).getEmail().equals(jugador.getEmail())) {
                 log.warn("Intento de registro de correo ya existente: {}", jDto.email());
                 throw new ResourceAlreadyExistsException("Jugador", "email", jDto.email());
             }
         
-            if (!jDto.documento().equals(jugador.getDocumento())) {
+            if (lJugadors.get(0).getDocumento().equals(jugador.getDocumento())) {
                 log.warn("Intento de registro de documento ya existente: {}", jDto.documento());
                 throw new ResourceAlreadyExistsException("Jugador", "documento", jDto.documento());
             }
         
-            if (jDto.numero_camiseta() != jugador.getNumero_camiseta()) {
+            if (lJugadors.get(0).getNumero_camiseta() == jugador.getNumero_camiseta() && lJugadors.get(0).getEquipoId().equals(jugador.getEquipoId())) {
                 throw new ResourceAlreadyExistsException("Jugador", "numero_camiseta", jDto.numero_camiseta());
             }
         }
