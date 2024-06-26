@@ -1,9 +1,9 @@
 package com.plan.entrenamiento.service.models;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,18 +19,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "metodo_entrenamiento")
-public class MetodoEntrenamiento {
+@Table(name = "microciclo")
+public class Microciclo {
 
     @Id
     @SequenceGenerator(
-        name = "metodo_entrenamiento_sequence",
-        sequenceName = "metodo_entrenamiento_sequence",
+        name = "microciclo_sequence",
+        sequenceName = "mesociclo_sequence",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "metodo_entrenamiento_sequence"
+        generator = "microciclo_sequence"
     )
     private Long id;
 
@@ -38,15 +38,12 @@ public class MetodoEntrenamiento {
     private String nombre;
 
     @Column(nullable = false)
-    private String descripcion;
+    private String descipcion;
 
-    @Enumerated(value = EnumType.STRING)
-    private TipoCarga carga;
+    @Column(name = "fecha_inicio", nullable = false)
+    private LocalDate fechaInicio;
 
-    @Enumerated(value = EnumType.STRING)
-    private TipoIntensidad intensidad;
-
-    @Column(nullable = false)
-    private int duracion;
+    @Column(name = "fecha_fin", nullable = false)
+    private LocalDate fechaFin;
     
 }
