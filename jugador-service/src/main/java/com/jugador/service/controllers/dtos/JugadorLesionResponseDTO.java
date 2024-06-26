@@ -11,6 +11,8 @@ public class JugadorLesionResponseDTO {
 
     private Long id;
 
+    private Long lesionId;
+
     private String lesion;
 
     private String fecha_inicio;

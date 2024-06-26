@@ -472,6 +472,7 @@ public class JugadorController {
 
         return JugadorLesionResponseDTO.builder()
                 .id(jLesion.getId())
+                .lesionId(jLesion.getLesion().getId())
                 .lesion(jLesion.getLesion().getNombre())
                 .fecha_inicio(jLesion.getFecha_inicio().toString())
                 .fecha_fin(jLesion.getFecha_fin().toString())
