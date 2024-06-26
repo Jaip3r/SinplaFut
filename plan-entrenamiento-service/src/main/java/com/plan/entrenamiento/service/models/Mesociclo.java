@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -48,6 +49,10 @@ public class Mesociclo {
 
     @Enumerated(value = EnumType.STRING)
     private TipoMesociclo tipo;
+
+    @ManyToOne(targetEntity = PlanEntrenamiento.class)
+    @JoinColumn(name = "plan_id")
+    private PlanEntrenamiento planEntrenamiento;
 
     @OneToMany(targetEntity = Microciclo.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "mesociclo_id", referencedColumnName = "id")

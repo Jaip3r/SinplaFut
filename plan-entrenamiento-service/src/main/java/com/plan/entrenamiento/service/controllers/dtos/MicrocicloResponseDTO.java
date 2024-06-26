@@ -18,5 +18,7 @@ public class MicrocicloResponseDTO {
     private String fechaInicio;
 
     private String fechaFin;
+
+    private Long mesociclo_id;
     
 }

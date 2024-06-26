@@ -16,5 +16,7 @@ public class MesocicloResponseDTO {
     private String fechaFin;
 
     private String tipo;
+
+    private Long plan_id;
     
 }

@@ -6,8 +6,11 @@ import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 
 public record MicrocicloDTO(
 
@@ -25,7 +28,12 @@ public record MicrocicloDTO(
     LocalDate fechaInicio,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    LocalDate fechaFin
+    LocalDate fechaFin,
+
+    @NotNull(message = "El identificador del mesociclo es obligatorio")
+    @Positive(message = "El identificador del mesociclo no puede ser cero 0 negativo")
+    @Digits(integer = Integer.MAX_VALUE, fraction = 0, message = "El identificador del mesociclo debe ser un número entero positivo")
+    Long mesociclo_id
 
 ) {
     
