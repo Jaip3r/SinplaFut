@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.team.service.controllers.dtos.JugadorDTO;
-import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
+import com.team.service.controllers.dtos.SesionEntrenamientoDTO;
 import com.team.service.models.Team;
 
 public interface TeamService {
@@ -29,6 +29,6 @@ public interface TeamService {
 
     List<JugadorDTO> findJugadorByEstado(Long equipoId, String estado);
 
-    List<PlanEntrenamientoDTO> findSesionesByEquipoId(Long equipoId);
+    List<SesionEntrenamientoDTO> findSesionesByEquipoId(Long equipoId);
     
 }

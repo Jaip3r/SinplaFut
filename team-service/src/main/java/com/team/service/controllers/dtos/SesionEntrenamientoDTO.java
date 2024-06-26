@@ -7,7 +7,8 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class PlanEntrenamientoDTO {
+public class SesionEntrenamientoDTO {
+
     private Long id;
 
     private String nombre;
@@ -23,5 +24,6 @@ public class PlanEntrenamientoDTO {
     private String tipo_sesion;
 
     private Long equipoId;
+
 
 }

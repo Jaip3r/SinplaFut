@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.team.service.client.CuerpoTecnicoClient;
 import com.team.service.client.JugadorClient;
-import com.team.service.client.PlanEntrenamientoClient;
+import com.team.service.client.SesionEntrenamientoClient;
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.team.service.controllers.dtos.JugadorDTO;
-import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
+import com.team.service.controllers.dtos.SesionEntrenamientoDTO;
 import com.team.service.models.Team;
 import com.team.service.persistence.ITeamDAO;
 import com.team.service.services.TeamService;
@@ -22,7 +22,7 @@ public class TeamServiceImpl implements TeamService {
 
     private final ITeamDAO teamDAO;
     private final CuerpoTecnicoClient cTecnicoClient;
-    private final PlanEntrenamientoClient pEntrenamientoClient;
+    private final SesionEntrenamientoClient sEntrenamientoClient;
     private final JugadorClient jugadorClient;
 
     @Override
@@ -66,8 +66,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<PlanEntrenamientoDTO> findSesionesByEquipoId(Long equipoId) {
-        return this.pEntrenamientoClient.findByEquipo(equipoId);
+    public List<SesionEntrenamientoDTO> findSesionesByEquipoId(Long equipoId) {
+        return this.sEntrenamientoClient.findByEquipo(equipoId);
     }
 
     @Override

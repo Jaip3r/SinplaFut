@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.team.service.controllers.dtos.CuerpoTecnicoDTO;
 import com.team.service.controllers.dtos.JugadorDTO;
-import com.team.service.controllers.dtos.PlanEntrenamientoDTO;
+import com.team.service.controllers.dtos.SesionEntrenamientoDTO;
 import com.team.service.controllers.dtos.TeamDTO;
 import com.team.service.controllers.dtos.TeamResponseDTO;
 import com.team.service.controllers.payload.ApiResponse;
@@ -320,7 +320,7 @@ public class TeamController {
         }
 
         // Obtenemos la lista de sesiones de entrenamiento asociadas al club
-        List<PlanEntrenamientoDTO> pEntrenamientoDTO = this.teamService.findSesionesByEquipoId(equipoId);
+        List<SesionEntrenamientoDTO> pEntrenamientoDTO = this.teamService.findSesionesByEquipoId(equipoId);
 
         return ResponseEntity.ok(ApiResponse
             .builder()
