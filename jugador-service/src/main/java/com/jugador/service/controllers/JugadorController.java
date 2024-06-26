@@ -126,7 +126,9 @@ public class JugadorController {
             throw new ResourceAlreadyExistsException("Jugador", "email o documento", "");
         }
 
-        if (this.jugadorService.findByEquipoAndCamiseta(jDto.equipoId(), jDto.numero_camiseta()).isPresent()) {
+        // Verificación de camiseta
+        Optional<Jugador> camisaExists = this.jugadorService.findByEquipoAndCamiseta(jDto.equipoId(), jDto.numero_camiseta());
+        if (camisaExists.isPresent() && !camisaExists.get().getId().equals(jugador.getId())) {
             throw new ResourceAlreadyExistsException("Jugador", "número de camiseta", jDto.numero_camiseta());
         }
 
